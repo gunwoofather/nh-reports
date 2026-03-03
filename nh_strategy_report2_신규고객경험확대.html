@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NH투자증권 | 해외주식 주식모으기 확대 전략</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #003366;
+    --blue: #0057B8;
+    --sky: #4A9FD4;
+    --gold: #F5A623;
+    --orange: #E8621A;
+    --green: #00843D;
+    --green-light: #E8F5EE;
+    --bg: #F4F6FA;
+    --white: #FFFFFF;
+    --gray1: #F0F2F7;
+    --gray2: #B0B8C8;
+    --text: #1A2540;
+    --text2: #4A5568;
+    --border: #E2E8F0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .page {
+    width: 1100px;
+    margin: 30px auto;
+    background: var(--white);
+    box-shadow: 0 4px 40px rgba(0,51,102,0.12);
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--navy);
+    padding: 28px 48px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    right: -80px; top: -80px;
+    width: 300px; height: 300px;
+    border: 60px solid rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    right: 40px; top: 20px;
+    width: 160px; height: 160px;
+    border: 30px solid rgba(0,132,61,0.2);
+    border-radius: 50%;
+  }
+  .header-left .label {
+    color: #4DD68C;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .header-left h1 {
+    color: var(--white);
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.3;
+  }
+  .header-left h1 span { color: #4DD68C; }
+  .header-right {
+    text-align: right;
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    line-height: 1.8;
+    position: relative; z-index: 1;
+  }
+  .header-right strong { color: var(--white); font-weight: 700; }
+
+  .strategy-badge {
+    background: linear-gradient(135deg, var(--green), #00A84F);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 6px 20px;
+    display: inline-block;
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+
+  /* BODY */
+  .body {
+    padding: 36px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    border-left: 3px solid var(--green);
+    padding-left: 10px;
+    margin-bottom: 14px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .card.full-width { grid-column: 1 / -1; }
+
+  /* KEY METRICS */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    grid-column: 1 / -1;
+  }
+  .metric {
+    padding: 18px 16px;
+    border-right: 1px solid var(--border);
+    background: white;
+    text-align: center;
+  }
+  .metric:last-child { border-right: none; }
+  .metric .num {
+    font-size: 30px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .metric .num.green { color: var(--green); }
+  .metric .num.blue  { color: var(--blue); }
+  .metric .num.orange { color: var(--orange); }
+  .metric .num.gold  { color: var(--gold); }
+  .metric .lbl {
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .metric .sub {
+    font-size: 10px;
+    color: var(--gray2);
+    margin-top: 3px;
+  }
+
+  /* DISTRIBUTION TABLE */
+  .dist-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .dist-table th {
+    background: var(--navy);
+    color: white;
+    padding: 8px 10px;
+    font-weight: 600;
+    font-size: 11px;
+    text-align: center;
+  }
+  .dist-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    color: var(--text2);
+  }
+  .dist-table tr:last-child td { border-bottom: none; }
+  .dist-table tr.target-02 td { background: #EBF4FF; font-weight: 600; color: var(--navy); }
+  .dist-table tr.target-03 td { background: #E8F5EE; font-weight: 600; color: #004d20; }
+  .dist-table .tag {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+  }
+  .tag.t02 { background: #BDD7F7; color: var(--blue); }
+  .tag.t03 { background: #A8DBBE; color: #004d20; }
+
+  /* BAR MINI */
+  .bar-mini-wrap {
+    background: #F0F4FA;
+    border-radius: 3px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 3px;
+  }
+  .bar-mini { height: 100%; border-radius: 3px; }
+
+  /* INSIGHT LIST */
+  .insight-list { list-style: none; }
+  .insight-list li {
+    display: flex;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid #F0F2F7;
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .insight-list li:last-child { border-bottom: none; }
+  .insight-list .ico {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .ico.green  { background: #D1FAE5; color: var(--green); }
+  .ico.blue   { background: #EBF4FF; color: var(--blue); }
+  .ico.orange { background: #FFF3EA; color: var(--orange); }
+  .ico.gold   { background: #FFFAEA; color: #C87F00; }
+
+  /* TARGET CARDS */
+  .target-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 4px;
+  }
+  .target-card {
+    border-radius: 10px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .target-card.t02 {
+    background: linear-gradient(135deg, #EBF4FF, #F5F9FF);
+    border: 1px solid #BDD7F7;
+  }
+  .target-card.t03 {
+    background: linear-gradient(135deg, #E8F5EE, #F0FAF4);
+    border: 1px solid #A8DBBE;
+  }
+  .target-card .tc-label {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .t02 .tc-label { color: var(--blue); }
+  .t03 .tc-label { color: var(--green); }
+  .target-card .tc-title {
+    font-size: 14px;
+    font-weight: 900;
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .t02 .tc-title { color: var(--navy); }
+  .t03 .tc-title { color: #004d20; }
+  .target-card .tc-stat {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .tc-stat-item { text-align: center; }
+  .tc-stat-item .sv {
+    font-size: 20px;
+    font-weight: 900;
+    line-height: 1;
+  }
+  .t02 .sv { color: var(--blue); }
+  .t03 .sv { color: var(--green); }
+  .tc-stat-item .sl {
+    font-size: 9px;
+    color: var(--text2);
+    margin-top: 2px;
+  }
+  .target-card .tc-divider {
+    border: none;
+    border-top: 1px dashed;
+    margin: 10px 0;
+  }
+  .t02 .tc-divider { border-color: #BDD7F7; }
+  .t03 .tc-divider { border-color: #A8DBBE; }
+  .target-card .tc-strategy {
+    font-size: 11px;
+    color: var(--text2);
+    line-height: 1.65;
+  }
+  .target-card .tc-strategy strong { font-weight: 700; }
+
+  /* ACTION CARDS (strat-card style) */
+  .action-3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 4px;
+  }
+  .strat-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .strat-card .top-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .strat-card .num-badge {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 12px;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .strat-card h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 8px;
+    line-height: 1.4;
+  }
+  .strat-card p {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.65;
+  }
+  .strat-card .s-tag {
+    margin-top: 12px;
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+  }
+
+  /* FOOTER */
+  .footer {
+    padding: 14px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--gray2);
+  }
+  .footer strong { color: var(--green); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="label">디지털사업부 · 전략 보고서 2 / 2</div>
+      <div class="strategy-badge">STRATEGY 02</div>
+      <h1>해외주식 <span>주식모으기</span> 서비스<br>저빈도 거래 고객 확대 전략</h1>
+    </div>
+    <div class="header-right">
+      <strong>NH투자증권</strong><br>
+      해외주식 MS 3위 달성 전략<br>
+      2026년 3월
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- 핵심 지표 4개 -->
+    <div class="metrics-row">
+      <div class="metric">
+        <div class="num green">439K</div>
+        <div class="lbl">전략 타겟 고객</div>
+        <div class="sub">1~6회 거래 고객 합산</div>
+      </div>
+      <div class="metric">
+        <div class="num blue">4.2%</div>
+        <div class="lbl">1~3회 주식모으기 경험 비중</div>
+        <div class="sub">현재 약정비중 3.6%</div>
+      </div>
+      <div class="metric">
+        <div class="num" style="color:var(--green)">10.5%</div>
+        <div class="lbl">4~6회 주식모으기 경험 비중</div>
+        <div class="sub">현재 약정비중 8.1%</div>
+      </div>
+      <div class="metric">
+        <div class="num orange">+2.1만</div>
+        <div class="lbl">추가 약정 기대 고객수</div>
+        <div class="sub">타겟 전환율 5%p 달성 기준</div>
+      </div>
+    </div>
+
+    <!-- 현황 분석: 고객 분포 테이블 -->
+    <div class="card">
+      <div class="section-title">현황 분석 — 거래 빈도별 고객 분포</div>
+      <table class="dist-table">
+        <thead>
+          <tr>
+            <th>거래 월횟수</th>
+            <th>고객수</th>
+            <th>경험고객수</th>
+            <th>경험비중</th>
+            <th>현재 약정수</th>
+            <th>약정비중</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>미거래</td>
+            <td>420,279</td>
+            <td>17</td>
+            <td>—</td>
+            <td>2,679</td>
+            <td>0.6%</td>
+          </tr>
+          <tr class="target-02">
+            <td><span class="tag t02">TARGET 02</span><br>1 ~ 3회</td>
+            <td><strong>312,973</strong></td>
+            <td>13,256</td>
+            <td>4.2%</td>
+            <td>11,352</td>
+            <td>3.6%</td>
+          </tr>
+          <tr class="target-03">
+            <td><span class="tag t03">TARGET 03</span><br>4 ~ 6회</td>
+            <td><strong>126,141</strong></td>
+            <td>13,204</td>
+            <td>10.5%</td>
+            <td>10,278</td>
+            <td>8.1%</td>
+          </tr>
+          <tr>
+            <td>7 ~ 9회</td>
+            <td>80,564</td>
+            <td>8,964</td>
+            <td>11.1%</td>
+            <td>6,770</td>
+            <td>8.4%</td>
+          </tr>
+          <tr>
+            <td>10 ~ 12회</td>
+            <td>97,938</td>
+            <td>19,460</td>
+            <td>19.9%</td>
+            <td>15,874</td>
+            <td>16.2%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:14px; padding:10px 14px; background:#F8FAFF; border-radius:6px; border:1px dashed #BDD7F7; font-size:11px; color:var(--text2); line-height:1.7;">
+        💡 <strong>핵심 인사이트:</strong> 거래 빈도가 높을수록 주식모으기 경험·약정 비중이 증가하는 정비례 관계. 1~6회 저·중빈도 거래 고객은 <strong>전체 해외주식 거래 고객의 약 70%</strong>를 차지하며, 미경험 잠재 고객이 각각 95.8% / 89.5%로 전환 여지가 큼.
+      </div>
+    </div>
+
+    <!-- 전략 근거 인사이트 -->
+    <div class="card">
+      <div class="section-title">전략 근거 — Why 주식모으기?</div>
+      <ul class="insight-list">
+        <li>
+          <div class="ico green">①</div>
+          <div class="content">
+            <strong>비정기 거래의 자동화 전환</strong><br>
+            1~6회 저빈도 거래 고객은 불규칙한 매매 패턴을 보유. 주식모으기 약정을 통해 <strong>월정기 자동 매수</strong>로 전환 시 거래 지속성 확보 및 이탈 방어 가능.
+          </div>
+        </li>
+        <li>
+          <div class="ico blue">②</div>
+          <div class="content">
+            <strong>경험→약정 이탈 갭 존재</strong><br>
+            1~3회 구간은 경험 4.2% 대비 약정 3.6%로 <strong>0.6%p 이탈</strong>, 4~6회는 10.5% vs 8.1%로 <strong>2.4%p 이탈</strong>. 서비스 경험 후 이탈한 고객 재가입 유도도 병행 가능.
+          </div>
+        </li>
+        <li>
+          <div class="ico gold">③</div>
+          <div class="content">
+            <strong>규모 우위: 절대 고객수</strong><br>
+            1~3회(31.3만명) + 4~6회(12.6만명) = <strong>약 43.9만명</strong>. 약정 전환율을 1%p만 높여도 각각 +3,130명 / +1,261명의 추가 약정 확보 가능.
+          </div>
+        </li>
+        <li>
+          <div class="ico orange">④</div>
+          <div class="content">
+            <strong>소액·소수점 매수와의 시너지</strong><br>
+            주식모으기는 소액 자동 매수 구조로 "투자 진입 장벽"이 낮아, 전략 1의 첫거래 전환 고객을 <strong>장기 거래 고객으로 연결</strong>하는 파이프라인 역할 수행.
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 타겟별 전략 -->
+    <div class="card full-width">
+      <div class="section-title">타겟별 전략 — Target Segmentation</div>
+      <div class="target-grid">
+
+        <!-- TARGET 02 -->
+        <div class="target-card t02">
+          <div class="tc-label">Target 02 · 저빈도 거래자</div>
+          <div class="tc-title">1~3회 거래 고객<br>주식모으기 첫 경험 유도</div>
+          <div class="tc-stat">
+            <div class="tc-stat-item">
+              <div class="sv">312,973</div>
+              <div class="sl">전체 고객수</div>
+            </div>
+            <div class="tc-stat-item">
+              <div class="sv">299,717</div>
+              <div class="sl">미경험 잠재고객</div>
+            </div>
+            <div class="tc-stat-item">
+              <div class="sv">+14,986</div>
+              <div class="sl">목표 추가 약정 (+5%p)</div>
+            </div>
+          </div>
+          <hr class="tc-divider">
+          <div class="tc-strategy">
+            거래 빈도가 낮아 <strong>투자 습관이 미형성</strong>된 단계. 주식모으기를 통해 소액 자동 매수 경험을 제공하고, 정기적 거래 습관을 형성하는 것이 핵심.<br><br>
+            · 거래 후 D+7 이내 주식모으기 <strong>체험 쿠폰 / 첫 약정 혜택</strong> 안내 푸시 발송<br>
+            · "매달 1만원으로 자동 미국주식 모으기" 등 <strong>소액 자동화</strong> 메시지 강조<br>
+            · 앱 내 거래 화면에 <strong>주식모으기 전환 배너</strong> 노출
+          </div>
+        </div>
+
+        <!-- TARGET 03 -->
+        <div class="target-card t03">
+          <div class="tc-label">Target 03 · 중빈도 거래자</div>
+          <div class="tc-title">4~6회 거래 고객<br>주식모으기 약정 전환 촉진</div>
+          <div class="tc-stat">
+            <div class="tc-stat-item">
+              <div class="sv">126,141</div>
+              <div class="sl">전체 고객수</div>
+            </div>
+            <div class="tc-stat-item">
+              <div class="sv">112,937</div>
+              <div class="sl">미경험 잠재고객</div>
+            </div>
+            <div class="tc-stat-item">
+              <div class="sv">+5,647</div>
+              <div class="sl">목표 추가 약정 (+5%p)</div>
+            </div>
+          </div>
+          <hr class="tc-divider">
+          <div class="tc-strategy">
+            이미 <strong>해외주식 투자 관심과 경험</strong>이 있으나 거래가 비정기적인 단계. 주식모으기 약정을 통해 정기 투자자로 전환하는 업셀링 전략이 유효.<br><br>
+            · 주식모으기 경험고객 비중(10.5%)이 높아 <strong>제품 인지도는 형성</strong>된 상태<br>
+            · 경험→약정 이탈 2.4%p 고객 대상 <strong>재가입 캠페인</strong> 병행 실시<br>
+            · 관심 종목 기반 <strong>맞춤 포트폴리오 자동 적립</strong> 제안으로 약정 전환 유도
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 실행 전략 3열 -->
+    <div class="card full-width">
+      <div class="section-title">실행 전략 — Action Plan</div>
+      <div class="action-3col">
+
+        <!-- 전략 01 -->
+        <div class="strat-card">
+          <div class="top-bar" style="background:var(--blue);"></div>
+          <div class="num-badge" style="background:#EBF4FF; color:var(--blue);">01</div>
+          <h4>거래 직후<br>주식모으기 유입 최적화</h4>
+          <p>1~3회 저빈도 거래 고객의 거래 완료 직후 주식모으기 서비스 안내 화면 노출. "방금 매수한 종목, 매달 자동으로 모아보세요" 메시지로 전환 동기 극대화. 앱 내 거래 화면과 주식모으기 신청 화면 간 단계 최소화.</p>
+          <span class="s-tag" style="background:#EBF4FF; color:var(--blue);">UX / Product</span>
+        </div>
+
+        <!-- 전략 02 -->
+        <div class="strat-card">
+          <div class="top-bar" style="background:var(--green);"></div>
+          <div class="num-badge" style="background:#D1FAE5; color:var(--green);">02</div>
+          <h4>타겟 세그먼트별<br>맞춤 가입 캠페인</h4>
+          <p>거래 빈도 구간별로 차별화된 혜택과 메시지로 주식모으기 약정 가입 캠페인 운영. 1~3회 구간은 첫 약정 진입 혜택 중심, 4~6회 구간은 경험 후 이탈 고객 재가입 오퍼 병행.</p>
+          <span class="s-tag" style="background:#D1FAE5; color:var(--green);">Marketing / CRM</span>
+        </div>
+
+        <!-- 전략 03 -->
+        <div class="strat-card">
+          <div class="top-bar" style="background:var(--gold);"></div>
+          <div class="num-badge" style="background:#FFFAEA; color:#A07800;">03</div>
+          <h4>약정 지속성 관리<br>이탈 방어 자동화</h4>
+          <p>주식모으기 약정 이후에도 거래 유지율을 높이기 위한 지속 관리 체계 구축. 적립 현황 알림, 수익률 리포트 자동 발송으로 서비스 체감 가치 제고.</p>
+          <span class="s-tag" style="background:#FFFAEA; color:#A07800;">Retention / Data</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div><strong>NH투자증권</strong> · 전략기획부</div>
+    <div>해외주식 MS 3위 달성 전략 | 전략 2: 주식모으기 저빈도 거래 고객 확대</div>
+    <div>Confidential · Internal Use Only</div>
+  </div>
+
+</div><!-- /page -->
+</body>
+</html>
