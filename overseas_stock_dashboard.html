@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>해외주식 성과 대시보드</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #06080f;
+    --surface: #0d1117;
+    --surface2: #131920;
+    --border: #1e2a38;
+    --accent: #00d4ff;
+    --accent2: #00ff88;
+    --accent3: #ff6b35;
+    --accent4: #c084fc;
+    --text: #e8edf5;
+    --text-muted: #5a7080;
+    --text-dim: #3a5060;
+    --red: #ff4560;
+    --gold: #ffd700;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 24px 28px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .header-left { display: flex; flex-direction: column; gap: 6px; }
+
+  .header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 4px;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+    width: fit-content;
+  }
+
+  .header-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  h1 {
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .nsm-tag {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .nsm-tag strong { color: var(--accent2); font-weight: 700; }
+
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .date-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .kr-goal {
+    background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(192,132,252,0.15));
+    border: 1px solid rgba(255,107,53,0.3);
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 11px;
+    text-align: right;
+    line-height: 1.8;
+  }
+
+  .kr-goal .goal-label { color: var(--text-muted); font-size: 10px; letter-spacing: 1px; }
+  .kr-goal .goal-val { color: var(--accent3); font-weight: 700; font-size: 13px; }
+
+  /* ── PERIOD TABS ── */
+  .period-nav {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 4px;
+    width: fit-content;
+  }
+
+  .period-btn {
+    padding: 7px 20px;
+    border: none;
+    background: none;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'Noto Sans KR', sans-serif;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .period-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  /* ── SECTION TITLE ── */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── CARD BASE ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .card:hover { border-color: rgba(0,212,255,0.3); }
+
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .card-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .card-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .delta-pos { color: var(--accent2); font-weight: 700; }
+  .delta-neg { color: var(--red); font-weight: 700; }
+
+  .card-accent-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  /* ── PERIOD LABEL CHIP ── */
+  .period-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 9px;
+    color: var(--text-muted);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+  }
+
+  /* ── SPARKLINE ── */
+  /* FIX: height 명시적 지정, canvas도 height 속성 부여 */
+  .sparkline-wrap {
+    position: relative;
+    height: 52px;
+    margin-top: 10px;
+  }
+
+  /* ── GRID LAYOUTS ── */
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  /* FIX: M/S + 화면진입율 — 2컬럼(고정폭 + 가변) */
+  .grid-ms {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  /* FIX: 전환율 + 약정 — 전환율 고정, 약정 가변 */
+  .grid-conv {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  /* ── MARKET SHARE CARD ── */
+  .ms-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .ms-card:hover { border-color: rgba(0,212,255,0.2); }
+
+  .ms-rank-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ms-rank-row:last-of-type { border-bottom: none; }
+
+  .rank-badge {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    font-family: 'DM Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  .rank-1     { background: rgba(255,215,0,0.2);   color: var(--gold);   border: 1px solid rgba(255,215,0,0.4); }
+  .rank-2     { background: rgba(180,180,200,0.2); color: #b4b4c8;       border: 1px solid rgba(180,180,200,0.3); }
+  .rank-3     { background: rgba(0,212,255,0.15);  color: var(--accent); border: 1px solid rgba(0,212,255,0.4); }
+  .rank-other { background: rgba(255,255,255,0.04); color: var(--text-dim); border: 1px solid var(--border); }
+  .rank-self  { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .ms-name { font-size: 12px; font-weight: 600; flex: 1; min-width: 52px; }
+  .ms-bar-wrap { flex: 2; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .ms-bar { height: 100%; border-radius: 3px; }
+  .ms-pct { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; width: 44px; text-align: right; flex-shrink: 0; }
+
+  .gap-badge {
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-top: 14px;
+  }
+
+  /* ── SCREEN ENTRY ── */
+  .entry-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 260px));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .entry-item {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 14px 10px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  .entry-icon { font-size: 20px; margin-bottom: 6px; }
+  .entry-name { font-size: 10px; color: var(--text-muted); margin-bottom: 6px; line-height: 1.5; }
+  .entry-val  { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; }
+  .entry-trend { font-size: 10px; margin-top: 4px; }
+
+  /* ── CHART CARD ── */
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .chart-card:hover { border-color: rgba(0,212,255,0.2); }
+
+  /* ── MODUM HIGHLIGHT ── */
+  .modum-highlight {
+    background: linear-gradient(135deg, rgba(0,255,136,0.07), rgba(0,212,255,0.04));
+    border: 1px solid rgba(0,255,136,0.22);
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .modum-highlight::after {
+    content: '✦';
+    position: absolute;
+    right: 14px; top: 10px;
+    font-size: 42px;
+    color: rgba(0,255,136,0.06);
+    pointer-events: none;
+  }
+
+  /* ── CONVERSION ── */
+  .conv-big {
+    font-family: 'DM Mono', monospace;
+    font-size: 48px;
+    font-weight: 500;
+    color: var(--accent3);
+    line-height: 1;
+    margin: 8px 0 6px;
+  }
+
+  .conv-target {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .target-bar-wrap { flex: 1; height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+  .target-bar { height: 100%; background: linear-gradient(90deg, var(--accent3), var(--accent4)); border-radius: 4px; }
+
+  /* ── BOTTOM BAR ── */
+  .bottom-bar {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-dim);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .status-dot { display: inline-flex; align-items: center; gap: 6px; }
+  .status-dot::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent2);
+    box-shadow: 0 0 6px var(--accent2);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .card, .chart-card, .ms-card, .modum-highlight {
+    animation: fadeUp 0.45s ease both;
+  }
+
+  .grid-4 > *:nth-child(1) { animation-delay: 0.05s; }
+  .grid-4 > *:nth-child(2) { animation-delay: 0.10s; }
+  .grid-4 > *:nth-child(3) { animation-delay: 0.15s; }
+  .grid-4 > *:nth-child(4) { animation-delay: 0.20s; }
+
+  @media (max-width: 1100px) {
+    .grid-4    { grid-template-columns: repeat(2,1fr); }
+    .grid-ms   { grid-template-columns: 1fr; }
+    .grid-conv { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 640px) {
+    .grid-4    { grid-template-columns: 1fr; }
+    .entry-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <span class="header-badge">LIVE</span>
+      <h1>해외주식 <span>성과 대시보드</span></h1>
+      <p class="nsm-tag">NSM: 해외주식 거래고객수 증대 (MAU 기준)&nbsp;&nbsp;|&nbsp;&nbsp;<strong>KR: 해외주식 거래계좌수 기준 M/S 3위 달성 및 격차 확대</strong></p>
+    </div>
+    <div class="header-right">
+      <span class="date-chip">기준일 : 2025.03.04 &nbsp;|&nbsp; 마지막 업데이트 14:32</span>
+      <div class="kr-goal">
+        <div class="goal-label">KEY RESULT TARGET</div>
+        <div class="goal-val">해외주식 거래고객수 MAU 증대 &amp; 신규고객 전환율 제고</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- PERIOD TABS -->
+  <div class="period-nav">
+    <button class="period-btn" onclick="setPeriod(this)">월간</button>
+    <button class="period-btn active" onclick="setPeriod(this)">주간</button>
+    <button class="period-btn" onclick="setPeriod(this)">월간(약정)</button>
+  </div>
+
+  <!-- ① KPI 4종 -->
+  <div class="section-title">핵심 지표</div>
+  <div class="grid-4">
+
+    <div class="card">
+      <div class="card-accent-line" style="background:linear-gradient(90deg,var(--accent),transparent)"></div>
+      <span class="period-label">월간</span>
+      <div class="card-label">해외주식 거래계좌수</div>
+      <div class="card-value" style="color:var(--accent)">892,341</div>
+      <div class="card-sub"><span class="delta-pos">▲ +12,847</span>&nbsp;vs 전월</div>
+      <div class="sparkline-wrap"><canvas id="spark1" height="52"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-accent-line" style="background:linear-gradient(90deg,var(--accent2),transparent)"></div>
+      <span class="period-label">월간 MAU</span>
+      <div class="card-label">해외주식 거래고객수 (MAU)</div>
+      <div class="card-value" style="color:var(--accent2)">324,512</div>
+      <div class="card-sub"><span class="delta-pos">▲ +8,230</span>&nbsp;vs 전월</div>
+      <div class="sparkline-wrap"><canvas id="spark2" height="52"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-accent-line" style="background:linear-gradient(90deg,var(--accent3),transparent)"></div>
+      <span class="period-label">월간</span>
+      <div class="card-label">해외주식 약정금액</div>
+      <div class="card-value" style="color:var(--accent3)">3.82<span style="font-size:16px;opacity:.7">조</span></div>
+      <div class="card-sub"><span class="delta-pos">▲ +0.31조</span>&nbsp;vs 전월</div>
+      <div class="sparkline-wrap"><canvas id="spark3" height="52"></canvas></div>
+    </div>
+
+    <div class="modum-highlight">
+      <span class="period-label" style="background:rgba(0,255,136,0.08);border-color:rgba(0,255,136,0.25);color:var(--accent2)">월간</span>
+      <div class="card-label" style="color:rgba(0,255,136,0.65)">주식모으기 가입고객수</div>
+      <div class="card-value" style="color:var(--accent2)">147,820</div>
+      <div class="card-sub"><span class="delta-pos">▲ +6,104</span>&nbsp;vs 전월</div>
+      <div style="margin-top:6px;font-size:10px;color:rgba(0,255,136,0.4)">누적 가입 기준 (정기 적립 포함)</div>
+      <div class="sparkline-wrap"><canvas id="spark4" height="52"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- ② MTS 화면 진입율 -->
+  <div class="section-title">MTS 화면 진입율</div>
+
+  <div class="entry-grid" style="margin-bottom:14px">
+    <div class="entry-item">
+      <div class="entry-icon">📱</div>
+      <div class="entry-name">MTS MAU<br>진입율</div>
+      <div class="entry-val" style="color:var(--accent)">68.4%</div>
+      <div class="entry-trend delta-pos">▲ +1.2%p</div>
+    </div>
+    <div class="entry-item">
+      <div class="entry-icon">💹</div>
+      <div class="entry-name">해외주식<br>현재가 화면</div>
+      <div class="entry-val" style="color:var(--accent2)">42.7%</div>
+      <div class="entry-trend delta-pos">▲ +0.8%p</div>
+    </div>
+    <div class="entry-item">
+      <div class="entry-icon">🛒</div>
+      <div class="entry-name">해외주식<br>주문 화면</div>
+      <div class="entry-val" style="color:var(--accent3)">28.1%</div>
+      <div class="entry-trend delta-neg">▼ -0.3%p</div>
+    </div>
+  </div>
+
+  <div class="chart-card" style="margin-bottom:24px">
+    <div class="card-label" style="margin-bottom:14px">MTS 화면 진입율 추이
+      <span style="color:var(--text-dim);font-weight:400;letter-spacing:0">&nbsp;(주간)</span>
+    </div>
+    <div style="position:relative;height:160px"><canvas id="screenChart"></canvas></div>
+  </div>
+
+  <!-- ③ 신규고객 전환율 -->
+  <div class="section-title">신규고객 해외주식 거래 전환율</div>
+  <div class="grid-conv">
+
+    <!-- 좌: 현재값 요약 카드 (막대그래프 제거) -->
+    <div class="card">
+      <div class="card-accent-line" style="background:linear-gradient(90deg,var(--accent3),var(--accent4))"></div>
+      <span class="period-label" style="background:rgba(255,107,53,0.08);border-color:rgba(255,107,53,0.3);color:var(--accent3)">30일 내</span>
+      <div class="card-label">신규고객 해외주식 거래 전환율</div>
+      <div class="conv-big">23.6%</div>
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:20px;line-height:1.7">
+        당사 신규 개설 고객 중<br>30일 이내 해외주식 첫 거래 비율
+      </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase">목표 달성율</div>
+      <div class="conv-target">
+        <span style="font-size:10px;color:var(--text-muted);width:24px;flex-shrink:0">0%</span>
+        <div class="target-bar-wrap">
+          <div class="target-bar" style="width:78.7%"></div>
+        </div>
+        <span style="font-size:10px;color:var(--accent3);font-weight:700;width:50px;text-align:right;flex-shrink:0">목표 30%</span>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:8px">달성율 <span style="color:var(--accent3);font-weight:700;font-size:13px">78.7%</span></div>
+    </div>
+
+    <!-- 우: 월별 신규고객 해외주식 경험 전환율 추이 -->
+    <div class="chart-card">
+      <div class="card-label" style="margin-bottom:14px">월별 신규고객 해외주식 경험 전환율 추이
+        <span style="color:var(--text-dim);font-weight:400;letter-spacing:0">&nbsp;(월간, %)</span>
+      </div>
+      <div style="position:relative;height:200px"><canvas id="convMonthly"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- ④ 주식모으기 추이 -->
+  <div class="section-title">주식모으기 가입고객 추이</div>
+  <div class="chart-card" style="margin-bottom:24px">
+    <div class="card-label" style="margin-bottom:14px">주식모으기 누적 / 신규 가입고객수 추이
+      <span style="color:var(--text-dim);font-weight:400;letter-spacing:0">&nbsp;(월간)</span>
+    </div>
+    <div style="position:relative;height:160px"><canvas id="modumChart"></canvas></div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="bottom-bar">
+    <span class="status-dot">실시간 연동 중</span>
+    <span>데이터 출처: 내부 시스템 (CRM / MTS / 거래소) &nbsp;|&nbsp; 자동 새로고침 5분 간격</span>
+    <span>NSM Dashboard v2.2</span>
+  </div>
+
+</div>
+
+<script>
+/* ── PERIOD BUTTONS ── */
+function setPeriod(btn) {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* ── GLOBAL CHART DEFAULTS ── */
+Chart.defaults.color = '#5a7080';
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 10;
+
+const GRID = 'rgba(30,42,56,0.9)';
+
+/* ────────────────────────────────────────────────
+   FIX 1: SPARKLINES
+   backgroundColor를 rgba() 문자열로 직접 전달.
+   기존 코드의 hex→rgba 변환 정규식이 잘못 동작해
+   배경이 검게 렌더링되던 버그 수정.
+──────────────────────────────────────────────── */
+function makeSparkline(id, data, lineColor, fillColor) {
+  const ctx = document.getElementById(id).getContext('2d');
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map((_, i) => i),
+      datasets: [{
+        data,
+        borderColor: lineColor,
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.4,
+        fill: true,
+        backgroundColor: fillColor,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } },
+      animation: { duration: 1000, easing: 'easeInOutQuart' }
+    }
+  });
+}
+
+makeSparkline('spark1', [820000,834000,845000,852000,868000,878000,892341], '#00d4ff', 'rgba(0,212,255,0.12)');
+makeSparkline('spark2', [285000,293000,301000,308000,314000,319000,324512], '#00ff88', 'rgba(0,255,136,0.12)');
+makeSparkline('spark3', [2.8,3.0,3.1,3.3,3.5,3.51,3.82],                  '#ff6b35', 'rgba(255,107,53,0.12)');
+makeSparkline('spark4', [98000,108000,118000,128000,136000,141716,147820],  '#00ff88', 'rgba(0,255,136,0.12)');
+
+/* ── SCREEN ENTRY CHART ── */
+new Chart(document.getElementById('screenChart').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10'],
+    datasets: [
+      {
+        label: 'MTS MAU',
+        data: [62,63.5,64,65.8,65.2,66.4,67.1,67.8,68.0,68.4],
+        borderColor: '#00d4ff', borderWidth: 2,
+        pointRadius: 3, pointBackgroundColor: '#00d4ff',
+        tension: 0.4, fill: false
+      },
+      {
+        label: '현재가 화면',
+        data: [38,38.8,39.5,40.2,40.8,41.0,41.5,42.0,42.3,42.7],
+        borderColor: '#00ff88', borderWidth: 2,
+        pointRadius: 3, pointBackgroundColor: '#00ff88',
+        tension: 0.4, fill: false
+      },
+      {
+        label: '주문 화면',
+        data: [30,29.8,29.5,29.0,28.8,28.5,28.7,28.4,28.2,28.1],
+        borderColor: '#ff6b35', borderWidth: 2,
+        pointRadius: 3, pointBackgroundColor: '#ff6b35',
+        tension: 0.4, fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { boxWidth: 10, padding: 16, color: '#5a7080' } },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    scales: {
+      x: { grid: { color: GRID }, ticks: { color: '#5a7080' } },
+      y: {
+        grid: { color: GRID },
+        ticks: { color: '#5a7080', callback: v => v + '%' },
+        min: 20, max: 80
+      }
+    }
+  }
+});
+
+/* ── 월별 신규고객 해외주식 경험 전환율 추이 ── */
+new Chart(document.getElementById('convMonthly').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: ['24.10','11','12','25.01','02','03(현)'],
+    datasets: [
+      {
+        label: '전환율',
+        data: [18.2, 19.5, 20.8, 21.4, 22.9, 23.6],
+        borderColor: '#ff6b35',
+        backgroundColor: 'rgba(255,107,53,0.10)',
+        borderWidth: 2,
+        pointRadius: 4,
+        pointBackgroundColor: '#ff6b35',
+        tension: 0.4,
+        fill: true,
+        yAxisID: 'y',
+      },
+      {
+        label: '목표',
+        data: [25, 26, 27, 28, 29, 30],
+        borderColor: 'rgba(192,132,252,0.7)',
+        backgroundColor: 'transparent',
+        borderDash: [5, 3],
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: false,
+        yAxisID: 'y',
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        labels: { boxWidth: 10, padding: 14, color: '#5a7080' }
+      },
+      tooltip: { mode: 'index', intersect: false }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#5a7080', font: { size: 9 } } },
+      y: {
+        grid: { color: GRID },
+        ticks: { color: '#5a7080', callback: v => v + '%' },
+        min: 15, max: 35
+      }
+    }
+  }
+});
+
+/* ────────────────────────────────────────────────
+   FIX 4: MODUM CHART
+   gradient → rgba 단색 교체.
+   y2 축 명시적 등록 확인 (누락 시 우측 축 미표시).
+──────────────────────────────────────────────── */
+new Chart(document.getElementById('modumChart').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: ['10월','11월','12월','1월','2월','3월(현)'],
+    datasets: [
+      {
+        label: '누적 가입',
+        data: [98000, 108000, 118000, 128000, 141716, 147820],
+        borderColor: '#00ff88',
+        backgroundColor: 'rgba(0,255,136,0.12)',
+        borderWidth: 2,
+        pointRadius: 4, pointBackgroundColor: '#00ff88',
+        tension: 0.4, fill: true,
+        yAxisID: 'y',
+      },
+      {
+        label: '신규 가입',
+        data: [9200, 10000, 10000, 10000, 13716, 6104],
+        borderColor: '#c084fc',
+        backgroundColor: 'transparent',
+        borderDash: [5, 3],
+        borderWidth: 2,
+        pointRadius: 4, pointBackgroundColor: '#c084fc',
+        tension: 0.4, fill: false,
+        yAxisID: 'y2',
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'top', labels: { boxWidth: 10, padding: 16, color: '#5a7080' } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#5a7080' } },
+      y: {
+        grid: { color: GRID },
+        ticks: { color: '#5a7080', callback: v => (v / 10000).toFixed(0) + '만' },
+        title: { display: true, text: '누적 가입', color: '#00ff88', font: { size: 9 } }
+      },
+      y2: {
+        position: 'right',
+        grid: { display: false },
+        ticks: { color: '#c084fc', callback: v => (v / 1000).toFixed(0) + '천' },
+        title: { display: true, text: '신규 가입', color: '#c084fc', font: { size: 9 } }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
