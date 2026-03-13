@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NH투자증권 | 해외주식 신규고객 전환율 전략</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --navy: #003366;
+    --blue: #0057B8;
+    --sky: #4A9FD4;
+    --gold: #F5A623;
+    --orange: #E8621A;
+    --bg: #F4F6FA;
+    --white: #FFFFFF;
+    --gray1: #F0F2F7;
+    --gray2: #B0B8C8;
+    --text: #1A2540;
+    --text2: #4A5568;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* PAGE LAYOUT */
+  .page {
+    width: 1100px;
+    margin: 30px auto;
+    background: var(--white);
+    box-shadow: 0 4px 40px rgba(0,51,102,0.12);
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--navy);
+    padding: 28px 48px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    right: -80px; top: -80px;
+    width: 300px; height: 300px;
+    border: 60px solid rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    right: 40px; top: 20px;
+    width: 160px; height: 160px;
+    border: 30px solid rgba(74,159,212,0.15);
+    border-radius: 50%;
+  }
+  .header-left .label {
+    color: var(--sky);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .header-left h1 {
+    color: var(--white);
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1.3;
+  }
+  .header-left h1 span { color: var(--gold); }
+  .header-right {
+    text-align: right;
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    line-height: 1.8;
+    position: relative; z-index: 1;
+  }
+  .header-right strong { color: var(--white); font-weight: 700; }
+
+  /* STRATEGY BADGE */
+  .strategy-badge {
+    background: linear-gradient(135deg, var(--blue), var(--sky));
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 6px 20px;
+    display: inline-block;
+  }
+
+  /* BODY */
+  .body {
+    padding: 36px 48px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  /* SECTION TITLES */
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--blue);
+    text-transform: uppercase;
+    border-left: 3px solid var(--blue);
+    padding-left: 10px;
+    margin-bottom: 14px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 20px;
+  }
+  .card.full-width { grid-column: 1 / -1; }
+  .card.navy-bg {
+    background: var(--navy);
+    border: none;
+    color: white;
+  }
+  .card.highlight {
+    background: linear-gradient(135deg, #EBF4FF, #F0F7FF);
+    border: 1px solid #BDD7F7;
+  }
+
+  /* KEY METRICS */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .metric {
+    padding: 18px 16px;
+    border-right: 1px solid #E2E8F0;
+    background: white;
+    text-align: center;
+  }
+  .metric:last-child { border-right: none; }
+  .metric .num {
+    font-size: 32px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .metric .num.blue { color: var(--blue); }
+  .metric .num.orange { color: var(--orange); }
+  .metric .num.navy { color: var(--navy); }
+  .metric .num.gold { color: var(--gold); }
+  .metric .label {
+    font-size: 11px;
+    color: var(--text2);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  .metric .sub {
+    font-size: 10px;
+    color: var(--gray2);
+    margin-top: 3px;
+  }
+
+  /* CHART */
+  .chart-container {
+    position: relative;
+    height: 240px;
+  }
+
+  /* INSIGHT BOXES */
+  .insight-list { list-style: none; }
+  .insight-list li {
+    display: flex;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid #F0F2F7;
+    align-items: flex-start;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .insight-list li:last-child { border-bottom: none; }
+  .insight-list .ico {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .ico.blue { background: #EBF4FF; color: var(--blue); }
+  .ico.orange { background: #FFF3EA; color: var(--orange); }
+  .ico.gold { background: #FFFAEA; color: #C87F00; }
+  .insight-list .content strong { font-weight: 700; }
+
+  /* FUNNEL */
+  .funnel {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .funnel-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .funnel-bar-wrap {
+    flex: 1;
+    height: 34px;
+    background: #F0F4FA;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+  .funnel-bar {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 4px;
+    transition: width 0.8s ease;
+  }
+  .funnel-label {
+    width: 120px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .funnel-pct {
+    width: 40px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy);
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* STRATEGY ACTIONS */
+  .action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+  .action-item {
+    background: var(--gray1);
+    border-radius: 8px;
+    padding: 14px;
+    border-top: 3px solid var(--blue);
+  }
+  .action-item.accent { border-top-color: var(--orange); }
+  .action-item.gold { border-top-color: var(--gold); }
+  .action-item .step-num {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--blue);
+    margin-bottom: 6px;
+  }
+  .action-item.accent .step-num { color: var(--orange); }
+  .action-item.gold .step-num { color: #C87F00; }
+  .action-item h4 {
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .action-item p {
+    font-size: 11px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  /* KPI TABLE */
+  .kpi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .kpi-table th {
+    background: var(--navy);
+    color: white;
+    padding: 9px 12px;
+    font-weight: 600;
+    text-align: left;
+    font-size: 11px;
+  }
+  .kpi-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #E8ECF2;
+  }
+  .kpi-table tr:nth-child(even) td { background: #F8FAFC; }
+  .kpi-table .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .tag.critical { background: #FFEAEA; color: #C0392B; }
+  .tag.high { background: #FFF3EA; color: #E8621A; }
+  .tag.medium { background: #FFFAEA; color: #A07800; }
+
+  /* ANNOTATION BADGE */
+  .anno {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--orange);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  /* BOTTOM BAR */
+  .footer {
+    background: var(--navy);
+    padding: 14px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: rgba(255,255,255,0.5);
+    font-size: 10px;
+  }
+  .footer strong { color: white; }
+
+  /* ARROW DIVIDER */
+  .phase-arrow {
+    text-align: center;
+    padding: 4px 0;
+    color: var(--sky);
+    font-size: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="label">전략 보고서 · Strategy 1</div>
+      <h1>신규고객 해외주식<br><span>첫경험 전환율 극대화</span> 전략</h1>
+      <div style="margin-top:12px;">
+        <span class="strategy-badge">📌 30일 골든윈도우 집중 공략</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <strong>NH투자증권</strong><br>
+      전략기획 / 해외주식 MS 전략<br>
+      목표: 업계 6위 → <strong>3위</strong>
+    </div>
+  </div>
+
+  <!-- MAIN BODY -->
+  <div class="body">
+
+    <!-- 핵심 지표 4개 -->
+    <div class="full-width">
+      <div class="section-title">핵심 현황 지표</div>
+      <div class="metrics-row">
+        <div class="metric">
+          <div class="num blue">16%</div>
+          <div class="label">30일 내<br>누적 전환율</div>
+          <div class="sub">신규 계좌 개설 고객 기준</div>
+        </div>
+        <div class="metric">
+          <div class="num orange">76%</div>
+          <div class="label">1년 전환의<br>30일 내 집중도</div>
+          <div class="sub">16% ÷ 21% = 76.2%</div>
+        </div>
+        <div class="metric">
+          <div class="num navy">21%</div>
+          <div class="label">1년 누적<br>전환율</div>
+          <div class="sub">100일 이후 미전환 = 79%</div>
+        </div>
+        <div class="metric">
+          <div class="num gold">79%</div>
+          <div class="label">미전환 잠재<br>고객 비율</div>
+          <div class="sub">공략 가능한 기회 규모</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 차트 -->
+    <div class="card full-width">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+        <div>
+          <div class="section-title">신규고객 해외주식 일별 누적 전환율 곡선</div>
+          <p style="font-size:11px; color:var(--text2);">전환의 <strong>76%는 30일 이내</strong>에 발생 — 이후 전환 속도가 급격히 둔화되는 구조</p>
+        </div>
+        <div style="display:flex; gap:16px; font-size:11px; color:var(--text2); align-items:center;">
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:16px;height:3px;background:#0057B8;display:inline-block;border-radius:2px;"></span>현재 전환율</span>
+          <span style="display:flex;align-items:center;gap:5px;"><span style="width:16px;height:2px;border-top:2px dashed #E8621A;display:inline-block;"></span>목표 전환율 (D+30: 25% / D+100: 30%)</span>
+        </div>
+      </div>
+      <div class="chart-container">
+        <canvas id="conversionChart"></canvas>
+      </div>
+      <!-- 구간 annotation -->
+      <div style="display:flex; gap:12px; margin-top:14px;">
+        <div style="flex:1; padding:10px 14px; background:#EBF4FF; border-radius:6px; border-left:3px solid var(--blue);">
+          <div style="font-size:10px; font-weight:700; color:var(--blue); margin-bottom:3px;">🚀 급성장 구간 (D+0 ~ D+7)</div>
+          <div style="font-size:11px;">계좌 개설 직후 <strong>7일 안에 10%</strong> 전환 달성. 초기 모멘텀이 가장 강한 황금 구간</div>
+        </div>
+        <div style="flex:1; padding:10px 14px; background:#FFF8EA; border-radius:6px; border-left:3px solid var(--gold);">
+          <div style="font-size:10px; font-weight:700; color:#A07800; margin-bottom:3px;">📉 둔화 구간 (D+8 ~ D+30)</div>
+          <div style="font-size:11px;">초기 모멘텀 이후 전환 속도 감소. 지속적인 <strong>관심 유지 및 매수 동기 자극</strong>으로 추가 6%p 전환 확보 가능</div>
+        </div>
+        <div style="flex:1; padding:10px 14px; background:#FFF0EA; border-radius:6px; border-left:3px solid var(--orange);">
+          <div style="font-size:10px; font-weight:700; color:var(--orange); margin-bottom:3px;">💤 정체 구간 (D+31 ~ D+100)</div>
+          <div style="font-size:11px;"><strong>30일 이후 전환 속도 거의 0</strong>. 100일간 겨우 5%p 추가. 구조적 재개입 전략 필요</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 목표 설정 + 기대 효과 2열 -->
+    <div class="card full-width">
+      <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap: 32px;">
+
+        <!-- ① 전환율 목표 설정 -->
+        <div>
+          <div class="section-title">전환율 목표 설정</div>
+          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:100px; font-size:11px; font-weight:600; color:var(--text2); text-align:right; flex-shrink:0;">현재 D+30</div>
+              <div style="flex:1; height:30px; background:#F0F4FA; border-radius:4px; overflow:hidden;">
+                <div style="width:53%; height:100%; background:#B0B8C8; display:flex; align-items:center; padding-left:10px; color:white; font-size:11px; font-weight:700; border-radius:4px;">16%</div>
+              </div>
+              <div style="width:32px; font-size:12px; font-weight:700; color:#888; text-align:right; flex-shrink:0;">16%</div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:100px; font-size:11px; font-weight:700; color:var(--blue); text-align:right; flex-shrink:0;">목표 D+30</div>
+              <div style="flex:1; height:30px; background:#EBF4FF; border-radius:4px; overflow:hidden; position:relative;">
+                <div style="width:83%; height:100%; background:var(--blue); display:flex; align-items:center; padding-left:10px; color:white; font-size:11px; font-weight:700; border-radius:4px; position:relative;">
+                  25%
+                  <span style="position:absolute; right:6px; font-size:9px; background:rgba(255,255,255,0.25); padding:1px 5px; border-radius:8px;">+9%p ↑</span>
+                </div>
+              </div>
+              <div style="width:32px; font-size:12px; font-weight:700; color:var(--blue); text-align:right; flex-shrink:0;">25%</div>
+            </div>
+
+            <div style="border-top:1px dashed #E2E8F0; margin:2px 0;"></div>
+
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:100px; font-size:11px; font-weight:600; color:var(--text2); text-align:right; flex-shrink:0;">현재 D+100</div>
+              <div style="flex:1; height:30px; background:#F0F4FA; border-radius:4px; overflow:hidden;">
+                <div style="width:60%; height:100%; background:#B0B8C8; display:flex; align-items:center; padding-left:10px; color:white; font-size:11px; font-weight:700; border-radius:4px;">18%</div>
+              </div>
+              <div style="width:32px; font-size:12px; font-weight:700; color:#888; text-align:right; flex-shrink:0;">18%</div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:100px; font-size:11px; font-weight:700; color:var(--orange); text-align:right; flex-shrink:0;">목표 D+100</div>
+              <div style="flex:1; height:30px; background:#FFF0EA; border-radius:4px; overflow:hidden; position:relative;">
+                <div style="width:100%; height:100%; background:var(--orange); display:flex; align-items:center; padding-left:10px; color:white; font-size:11px; font-weight:700; border-radius:4px; position:relative;">
+                  30%
+                  <span style="position:absolute; right:6px; font-size:9px; background:rgba(255,255,255,0.25); padding:1px 5px; border-radius:8px;">+12%p ↑</span>
+                </div>
+              </div>
+              <div style="width:32px; font-size:12px; font-weight:700; color:var(--orange); text-align:right; flex-shrink:0;">30%</div>
+            </div>
+
+          </div>
+          <div style="background:#F8FAFF; border-radius:6px; padding:10px 12px; border:1px dashed #BDD7F7; font-size:11px; color:var(--text2); line-height:1.7;">
+            💡 D+30 전환율 <strong>16% → 25%</strong>(+9%p), D+100 <strong>18% → 30%</strong>(+12%p) 달성 시<br>
+            해외주식 거래 MS 3위권 진입의 핵심 퀀텀점프 실현 가능
+          </div>
+        </div>
+
+
+        <div>
+          <div class="section-title">기대 효과 · 거래 고객수 추정</div>
+          <div style="font-size:10px; color:var(--gray2); margin-bottom:12px;">기준: 2026년 연간 신규 가입 50만명 / 월 유입 약 4.2만명</div>
+
+          <!-- 6개월 효과 -->
+          <div style="background:linear-gradient(135deg,#EBF4FF,#F5F9FF); border-radius:8px; padding:13px 14px; margin-bottom:10px; border:1px solid #C8DFF8;">
+            <div style="font-size:9px; font-weight:700; color:var(--blue); letter-spacing:1.5px; margin-bottom:8px;">6개월 후 (D+180 기준)</div>
+            <div style="display:flex; gap:10px; align-items:stretch;">
+              <!-- 누적 전환 고객 -->
+              <div style="flex:1; background:white; border-radius:6px; padding:10px; text-align:center; border:1px solid #D8ECFF;">
+                <div style="font-size:10px; color:var(--text2); margin-bottom:4px; font-weight:500;">누적 추가 전환고객</div>
+                <div style="font-size:20px; font-weight:900; color:var(--blue); line-height:1;">+2.3만명</div>
+                <div style="font-size:9px; color:var(--gray2); margin-top:3px;">25만명 × (+9%p)</div>
+              </div>
+              <!-- 월 MAU -->
+              <div style="flex:1; background:white; border-radius:6px; padding:10px; text-align:center; border:1px solid #D8ECFF;">
+                <div style="font-size:10px; color:var(--text2); margin-bottom:4px; font-weight:500;">6개월째 월 추가 MAU</div>
+                <div style="font-size:20px; font-weight:900; color:var(--sky); line-height:1;">+1.5만명</div>
+                <div style="font-size:9px; color:var(--gray2); margin-top:3px;">코호트 체인 누적 기준</div>
+              </div>
+            </div>
+            <div style="margin-top:8px; padding:7px 10px; background:rgba(0,87,184,0.06); border-radius:5px; font-size:10px; color:var(--text2); line-height:1.5;">
+              📌 6개월 누적 MAU 증가분 합산 <strong style="color:var(--blue);">+6.1만 거래-월</strong>
+            </div>
+          </div>
+
+          <!-- 12개월 효과 -->
+          <div style="background:linear-gradient(135deg,#FFF3EA,#FFF8F3); border-radius:8px; padding:13px 14px; border:1px solid #F5C9A8;">
+            <div style="font-size:9px; font-weight:700; color:var(--orange); letter-spacing:1.5px; margin-bottom:8px;">12개월 후 (D+365 기준)</div>
+            <div style="display:flex; gap:10px; align-items:stretch;">
+              <!-- 누적 전환 고객 -->
+              <div style="flex:1; background:white; border-radius:6px; padding:10px; text-align:center; border:1px solid #FFD9BE;">
+                <div style="font-size:10px; color:var(--text2); margin-bottom:4px; font-weight:500;">누적 추가 전환고객</div>
+                <div style="font-size:20px; font-weight:900; color:var(--orange); line-height:1;">+6.0만명</div>
+                <div style="font-size:9px; color:var(--gray2); margin-top:3px;">50만명 × (+12%p)</div>
+              </div>
+              <!-- 월 MAU -->
+              <div style="flex:1; background:white; border-radius:6px; padding:10px; text-align:center; border:1px solid #FFD9BE;">
+                <div style="font-size:10px; color:var(--text2); margin-bottom:4px; font-weight:500;">12개월째 월 추가 MAU</div>
+                <div style="font-size:20px; font-weight:900; color:var(--orange); line-height:1;">+2.9만명</div>
+                <div style="font-size:9px; color:var(--gray2); margin-top:3px;">코호트 체인 누적 기준</div>
+              </div>
+            </div>
+            <div style="margin-top:8px; padding:7px 10px; background:rgba(232,98,26,0.06); border-radius:5px; font-size:10px; color:var(--text2); line-height:1.5;">
+              📌 12개월 누적 MAU 증가분 합산 <strong style="color:var(--orange);">+20.1만 거래-월</strong>
+            </div>
+          </div>
+
+          <div style="margin-top:10px; padding:8px 12px; background:#F4F6FA; border-radius:6px; font-size:10px; color:var(--text2); line-height:1.6; border-left:3px solid var(--gray2);">
+            <strong>MAU 산출 기준:</strong> 당사 '25년 1월 신규 가입 후 해외주식 첫 거래 고객의 월별 재거래율을 적용. 매월 추가 전환된 신규 거래고객(3,750명/월)이 이후 각 달에 거래를 유지하는 비율을 코호트별로 누적 합산<br>
+            (M+1: 93.2% → M+2: 59.2% → M+3: 52.9% → … → M+11: 59.9%)
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3대 핵심 전략 Action Plan — full-width -->
+    <div class="card full-width">
+      <div class="section-title">실행 전략 — Action Plan (30-Day Activation)</div>
+      <div style="display:grid; grid-template-columns: repeat(3,1fr); gap:16px; margin-top:4px;">
+
+        <!-- 전략 01 -->
+        <div style="border:1px solid #E2E8F0; border-radius:12px; padding:22px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--blue);"></div>
+          <div style="width:28px; height:28px; border-radius:50%; background:#EBF4FF; color:var(--blue); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-bottom:12px;">01</div>
+          <h4 style="font-size:13px; font-weight:700; color:var(--navy); margin-bottom:8px; line-height:1.4;">온보딩 UX 개선 및<br>해외주식 노출 강화</h4>
+          <p style="font-size:12px; color:var(--text2); line-height:1.65;">
+            · 주문 경로 노출 강화 및 단순화<br>
+            · 해외주식 관련 온보딩 컨텐츠 강화
+          </p>
+          <span style="margin-top:12px; display:inline-block; background:#EBF4FF; color:var(--blue); font-size:10px; font-weight:600; padding:3px 10px; border-radius:100px; letter-spacing:0.5px;">UX / Product</span>
+        </div>
+
+        <!-- 전략 02 -->
+        <div style="border:1px solid #E2E8F0; border-radius:12px; padding:22px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--orange);"></div>
+          <div style="width:28px; height:28px; border-radius:50%; background:#FFF0EA; color:var(--orange); font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-bottom:12px;">02</div>
+          <h4 style="font-size:13px; font-weight:700; color:var(--navy); margin-bottom:8px; line-height:1.4;">30일 한정 첫거래<br>인센티브 캠페인</h4>
+          <p style="font-size:12px; color:var(--text2); line-height:1.65;">신규 가입 후 30일 이내 해외주식 첫거래 고객을 대상으로 인센티브 이벤트를 운영하여 시간 제한 기반의 전환을 촉진합니다.</p>
+          <span style="margin-top:12px; display:inline-block; background:#FFF0EA; color:var(--orange); font-size:10px; font-weight:600; padding:3px 10px; border-radius:100px; letter-spacing:0.5px;">Marketing</span>
+        </div>
+
+        <!-- 전략 03 -->
+        <div style="border:1px solid #E2E8F0; border-radius:12px; padding:22px; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:0; left:0; right:0; height:3px; background:var(--gold);"></div>
+          <div style="width:28px; height:28px; border-radius:50%; background:#FFFAEA; color:#A07800; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; margin-bottom:12px;">03</div>
+          <h4 style="font-size:13px; font-weight:700; color:var(--navy); margin-bottom:8px; line-height:1.4;">맞춤형 리마인드<br>Push / 알림 자동화</h4>
+          <p style="font-size:12px; color:var(--text2); line-height:1.65;">가입 후 7일·14일·21일 시점에 개인화된 종목 추천 또는 시황 알림 발송. 비전환 고객을 대상으로 행동 유도 메시지를 자동 트리거.</p>
+          <span style="margin-top:12px; display:inline-block; background:#FFFAEA; color:#A07800; font-size:10px; font-weight:600; padding:3px 10px; border-radius:100px; letter-spacing:0.5px;">CRM / Data</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div><strong>NH투자증권</strong> · 스쿼드1</div>
+    <div>해외주식 MS 3위 달성 전략 | 전략 1: 신규고객 첫경험 전환율 극대화</div>
+    <div>Confidential · Internal Use Only</div>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+const data = [
+  {d:0,v:1},{d:1,v:3},{d:2,v:4},{d:3,v:6},{d:4,v:7},{d:5,v:8},{d:6,v:9},{d:7,v:10},
+  {d:8,v:11},{d:9,v:11},{d:10,v:12},{d:11,v:12},{d:12,v:13},{d:13,v:13},{d:14,v:13},
+  {d:15,v:14},{d:16,v:14},{d:17,v:14},{d:18,v:14},{d:19,v:14},{d:20,v:15},{d:21,v:15},
+  {d:22,v:15},{d:23,v:15},{d:24,v:15},{d:25,v:15},{d:26,v:15},{d:27,v:15},{d:28,v:15},
+  {d:29,v:16},{d:30,v:16},{d:31,v:16},{d:32,v:16},{d:33,v:16},{d:34,v:16},{d:35,v:16},
+  {d:36,v:16},{d:37,v:16},{d:38,v:16},{d:39,v:16},{d:40,v:16},{d:41,v:16},{d:42,v:16},
+  {d:43,v:16},{d:44,v:16},{d:45,v:16},{d:46,v:16},{d:47,v:16},{d:48,v:17},{d:49,v:17},
+  {d:50,v:17},{d:51,v:17},{d:52,v:17},{d:53,v:17},{d:54,v:17},{d:55,v:17},{d:56,v:17},
+  {d:57,v:17},{d:58,v:17},{d:59,v:17},{d:60,v:17},{d:61,v:17},{d:62,v:17},{d:63,v:17},
+  {d:64,v:17},{d:65,v:17},{d:66,v:17},{d:67,v:17},{d:68,v:17},{d:69,v:17},{d:70,v:17},
+  {d:71,v:17},{d:72,v:17},{d:73,v:17},{d:74,v:17},{d:75,v:17},{d:76,v:17},{d:77,v:17},
+  {d:78,v:17},{d:79,v:17},{d:80,v:17},{d:81,v:18},{d:82,v:18},{d:83,v:18},{d:84,v:18},
+  {d:85,v:18},{d:86,v:18},{d:87,v:18},{d:88,v:18},{d:89,v:18},{d:90,v:18},{d:91,v:18},
+  {d:92,v:18},{d:93,v:18},{d:94,v:18},{d:95,v:18},{d:96,v:18},{d:97,v:18},{d:98,v:18},
+  {d:99,v:18},{d:100,v:18}
+];
+
+const labels = data.map(d => d.d === 0 || d.d % 10 === 0 ? `D+${d.d}` : '');
+const values = data.map(d => d.v);
+
+// Background color zones
+const bgPlugin = {
+  id: 'bgZones',
+  beforeDraw(chart) {
+    const {ctx, chartArea: {left, right, top, bottom}, scales: {x, y}} = chart;
+    if (!x) return;
+    ctx.save();
+    // Zone 1: D0-D7 light blue
+    ctx.fillStyle = 'rgba(0, 87, 184, 0.06)';
+    ctx.fillRect(x.getPixelForValue(0), top, x.getPixelForValue(7) - x.getPixelForValue(0), bottom - top);
+    // Zone 2: D7-D30 light gold
+    ctx.fillStyle = 'rgba(245, 166, 35, 0.06)';
+    ctx.fillRect(x.getPixelForValue(7), top, x.getPixelForValue(30) - x.getPixelForValue(7), bottom - top);
+    // Zone 3: D30+ light gray
+    ctx.fillStyle = 'rgba(176, 184, 200, 0.05)';
+    ctx.fillRect(x.getPixelForValue(30), top, right - x.getPixelForValue(30), bottom - top);
+    ctx.restore();
+  }
+};
+
+// 목표 전환율 라인: D+0에서 1%, D+30에 25%, D+100에 30% (easeInOut 곡선 보간)
+// 0~30일: easeOut(위로 볼록, 초반에 빠르게 올라가다 완만해짐)
+// 30~100일: easeInOut(부드러운 완만한 상승)
+function easeOut(t) {
+  return 1 - Math.pow(1 - t, 2.5);
+}
+function easeInOut(t) {
+  return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+}
+const targetValues = data.map(d => {
+  if (d.d <= 30) {
+    const t = d.d / 30;
+    return +(1 + (25 - 1) * easeOut(t)).toFixed(1);
+  } else {
+    const t = (d.d - 30) / 70;
+    return +(25 + (30 - 25) * easeInOut(t)).toFixed(1);
+  }
+});
+
+const ctx = document.getElementById('conversionChart').getContext('2d');
+new Chart(ctx, {
+  type: 'line',
+  plugins: [bgPlugin],
+  data: {
+    labels: data.map(d => d.d),
+    datasets: [
+      {
+        label: '현재 누적 전환율',
+        data: values,
+        borderColor: '#0057B8',
+        backgroundColor: 'rgba(0, 87, 184, 0.08)',
+        borderWidth: 2.5,
+        pointRadius: data.map(d => [0,7,30,100].includes(d.d) ? 5 : 0),
+        pointBackgroundColor: data.map(d => {
+          if (d.d === 30) return '#F5A623';
+          return '#0057B8';
+        }),
+        pointBorderColor: 'white',
+        pointBorderWidth: 2,
+        fill: true,
+        tension: 0.3,
+      },
+      {
+        label: '목표 전환율',
+        data: targetValues,
+        borderColor: '#E8621A',
+        backgroundColor: 'rgba(232, 98, 26, 0.0)',
+        borderWidth: 2,
+        borderDash: [6, 4],
+        pointRadius: data.map(d => [30, 100].includes(d.d) ? 6 : 0),
+        pointBackgroundColor: '#E8621A',
+        pointBorderColor: 'white',
+        pointBorderWidth: 2,
+        fill: false,
+        tension: 0.5,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        align: 'end',
+        labels: {
+          font: { size: 11 },
+          color: '#555',
+          usePointStyle: true,
+          pointStyleWidth: 16,
+          boxHeight: 3,
+        }
+      },
+      tooltip: {
+        backgroundColor: '#003366',
+        titleColor: 'white',
+        bodyColor: '#BDD7F7',
+        padding: 10,
+        callbacks: {
+          title: (items) => `D+${items[0].label}`,
+          label: (item) => item.datasetIndex === 0
+            ? ` 현재: ${item.raw}%`
+            : ` 목표: ${item.raw}%`
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          callback: (val, idx) => idx % 10 === 0 ? `D+${idx}` : '',
+          font: { size: 10 },
+          color: '#888',
+        },
+        grid: { color: 'rgba(0,0,0,0.04)' }
+      },
+      y: {
+        min: 0, max: 35,
+        ticks: {
+          callback: v => v + '%',
+          font: { size: 10 },
+          color: '#888',
+          stepSize: 5,
+        },
+        grid: { color: 'rgba(0,0,0,0.06)' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
