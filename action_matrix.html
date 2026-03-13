@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    background: #F4F6FA;
+    color: #1A2540;
+    font-size: 12px;
+    line-height: 1.6;
+    padding: 32px 36px;
+  }
+
+  /* HEADER */
+  .page-header {
+    background: #003366;
+    border-radius: 10px;
+    padding: 20px 28px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .page-header .title-block .badge {
+    display: inline-block;
+    background: rgba(77,214,140,0.2);
+    color: #4DD68C;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+  .page-header h1 { color: #fff; font-size: 18px; font-weight: 900; line-height: 1.3; }
+  .page-header h1 span { color: #4DD68C; }
+  .page-header .meta { text-align: right; color: rgba(255,255,255,0.55); font-size: 10px; line-height: 1.8; }
+  .page-header .meta strong { color: #fff; font-weight: 700; }
+
+  /* MATRIX */
+  .matrix { width: 100%; border-collapse: separate; border-spacing: 0; }
+
+  /* Corner cell */
+  .corner {
+    background: #E8EDF5;
+    border-radius: 8px 0 0 0;
+    width: 110px;
+    padding: 10px 12px;
+    vertical-align: middle;
+    border-right: 2px solid #F4F6FA;
+    border-bottom: 2px solid #F4F6FA;
+  }
+
+  /* Column headers */
+  .col-head {
+    padding: 12px 16px;
+    font-size: 11px;
+    font-weight: 700;
+    vertical-align: top;
+    border-bottom: 2px solid #F4F6FA;
+    border-right: 2px solid #F4F6FA;
+  }
+  .col-head:last-child { border-right: none; border-radius: 0 8px 0 0; }
+  .col-head.s1 { background: #0C447C; color: #B5D4F4; }
+  .col-head.s2 { background: #085041; color: #9FE1CB; }
+  .col-head .col-sub { font-size: 10px; font-weight: 400; opacity: 0.8; margin-top: 2px; }
+
+  /* Row header */
+  .row-head {
+    background: #E8EDF5;
+    padding: 10px 12px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #4A5568;
+    text-align: center;
+    vertical-align: middle;
+    border-right: 2px solid #F4F6FA;
+    border-bottom: 2px solid #F4F6FA;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: 1px;
+  }
+
+  /* Body cells */
+  .cell {
+    background: #fff;
+    padding: 14px 16px;
+    vertical-align: top;
+    border-right: 2px solid #F4F6FA;
+    border-bottom: 2px solid #F4F6FA;
+  }
+  .cell:last-child { border-right: none; }
+  tr:last-child .cell { border-bottom: none; }
+  tr:last-child .row-head { border-bottom: none; }
+
+  /* Sub-strategy badge */
+  .sub-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+  }
+  .sub-badge.s1 { background: #E6F1FB; color: #0C447C; }
+  .sub-badge.s2 { background: #E1F5EE; color: #085041; }
+
+  /* Action list */
+  .action-list { list-style: none; }
+  .action-list li {
+    font-size: 11px;
+    color: #2D3748;
+    padding: 3px 0 3px 13px;
+    position: relative;
+    line-height: 1.55;
+    border-bottom: 0.5px solid #EDF2F7;
+  }
+  .action-list li:last-child { border-bottom: none; }
+  .action-list li::before {
+    content: '';
+    position: absolute;
+    left: 3px; top: 9px;
+    width: 5px; height: 5px;
+    border-radius: 50%;
+  }
+  .s1-li::before { background: #378ADD; }
+  .s2-li::before { background: #1D9E75; }
+
+  /* Footer */
+  .footer {
+    margin-top: 16px;
+    padding: 10px 16px;
+    background: #fff;
+    border-radius: 6px;
+    border: 0.5px solid #E2E8F0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #B0B8C8;
+  }
+  .footer strong { color: #003366; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="title-block">
+    <div class="badge">ACTION MATRIX</div>
+    <h1>해외주식 MS 확대 전략<br><span>2대 전략 × 6개 하위전략 × 액션 리스트</span></h1>
+  </div>
+  <div class="meta">
+    <strong>NH투자증권</strong><br>
+    전략기획부 · 2026년 3월<br>
+    Confidential · Internal Use Only
+  </div>
+</div>
+
+<table class="matrix">
+  <thead>
+    <tr>
+      <td class="corner"></td>
+      <th class="col-head s1">
+        전략 1 · 신규고객 첫거래 전환율 극대화
+        <div class="col-sub">해외주식 미거래 신규 고객 대상</div>
+      </th>
+      <th class="col-head s2">
+        전략 2 · 주식모으기 저빈도 거래고객 확대
+        <div class="col-sub">1~6회 거래 기존 고객 대상</div>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <tr>
+      <td class="row-head">UX / Product</td>
+      <td class="cell">
+        <div class="sub-badge s1">하위전략 01 · 온보딩 UX 개선</div>
+        <ul class="action-list">
+          <li class="s1-li">해외주식 주문 경로 홈 화면 전면 배치</li>
+          <li class="s1-li">환전 → 매수 단일 화면 통합 (원화 입력)</li>
+          <li class="s1-li">가입 온보딩 플로우 내 해외주식 체험 콘텐츠 삽입</li>
+          <li class="s1-li">관심 종목 설정 / 테마 큐레이션 화면 제공</li>
+          <li class="s1-li">소수점 매수 안내 팝업 및 UI 노출</li>
+        </ul>
+      </td>
+      <td class="cell">
+        <div class="sub-badge s2">하위전략 01 · 거래 직후 주식모으기 유입</div>
+        <ul class="action-list">
+          <li class="s2-li">거래 완료 직후 주식모으기 안내 화면 자동 노출</li>
+          <li class="s2-li">"방금 매수한 종목, 자동으로 모아보세요" CTA 삽입</li>
+          <li class="s2-li">거래 화면 → 주식모으기 신청 단계 최소화</li>
+          <li class="s2-li">앱 내 주식모으기 진입 배너 상시 노출</li>
+          <li class="s2-li">소액 자동 매수 시뮬레이터 UI 제공</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td class="row-head">Marketing / 이벤트</td>
+      <td class="cell">
+        <div class="sub-badge s1">하위전략 02 · 30일 한정 인센티브 캠페인</div>
+        <ul class="action-list">
+          <li class="s1-li">가입 후 30일 내 첫거래 고객 대상 이벤트 운영</li>
+          <li class="s1-li">시간 제한 기반 전환 촉진 오퍼 설계</li>
+          <li class="s1-li">해외주식 첫거래 전용 혜택 패키지 기획</li>
+          <li class="s1-li">이벤트 랜딩 페이지 / 앱 배너 제작</li>
+        </ul>
+      </td>
+      <td class="cell">
+        <div class="sub-badge s2">하위전략 02 · 세그먼트별 가입 캠페인</div>
+        <ul class="action-list">
+          <li class="s2-li">1~3회 구간: 첫 약정 진입 혜택 중심 캠페인</li>
+          <li class="s2-li">4~6회 구간: 경험 후 이탈 고객 재가입 오퍼</li>
+          <li class="s2-li">구간별 차별화 메시지 / 크리에이티브 제작</li>
+          <li class="s2-li">"매달 1만원 자동 미국주식 모으기" 소구 메시지</li>
+          <li class="s2-li">앱 내 타겟 배너 및 팝업 노출</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td class="row-head">CRM / 알림 자동화</td>
+      <td class="cell">
+        <div class="sub-badge s1">하위전략 03 · 맞춤 Push / 알림 자동화</div>
+        <ul class="action-list">
+          <li class="s1-li">D+7 / D+14 / D+21 개인화 종목 추천 알림 발송</li>
+          <li class="s1-li">비전환 고객 행동 유도 메시지 자동 트리거</li>
+          <li class="s1-li">시황 / 관심 종목 이슈 알림 자동 발송</li>
+          <li class="s1-li">미전환 고객 단계별 넛지 시나리오 설계</li>
+        </ul>
+      </td>
+      <td class="cell">
+        <div class="sub-badge s2">하위전략 03 · 약정 지속성 관리</div>
+        <ul class="action-list">
+          <li class="s2-li">월별 적립 현황 / 수익률 리포트 자동 알림</li>
+          <li class="s2-li">서비스 체감 가치 강화 콘텐츠 발송</li>
+          <li class="s2-li">약정 갱신 / 금액 증액 유도 넛지 설계</li>
+          <li class="s2-li">장기 적립 고객 리워드 프로그램 연계</li>
+        </ul>
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+<div class="footer">
+  <span><strong>NH투자증권</strong> · 전략기획부</span>
+  <span>해외주식 MS 3위 달성 전략 | 전략 1+2 액션 매트릭스</span>
+  <span>Confidential · Internal Use Only</span>
+</div>
+
+</body>
+</html>
