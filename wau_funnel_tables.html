@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WAU 퍼널 데이터</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; font-size: 12px; background: #f5f5f5; color: #1a1a1a; padding: 24px; }
+  .section-title {
+    font-size: 13px; font-weight: 600; color: #1a1a1a;
+    margin: 24px 0 8px; padding: 5px 10px;
+    background: #e8e8e8; border-radius: 5px;
+    display: inline-block;
+  }
+  .section-title:first-child { margin-top: 0; }
+  .table-wrap { overflow-x: auto; border: 1px solid #c0c0c0; border-radius: 6px; margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; background: #fff; }
+  thead tr { background: #f0f0f0; border-bottom: 2px solid #aaa; }
+  th {
+    padding: 8px 10px; text-align: right;
+    font-weight: 600; font-size: 11px; color: #444;
+    white-space: nowrap;
+    border-right: 1px solid #ccc;
+    border-bottom: 2px solid #aaa;
+  }
+  th:first-child { text-align: center; }
+  th:last-child { border-right: none; }
+  th.highlight-col { background: #fff3cd; color: #7a5500; }
+  td {
+    padding: 6px 10px; text-align: right;
+    color: #1a1a1a;
+    border-bottom: 1px solid #ddd;
+    border-right: 1px solid #e0e0e0;
+    white-space: nowrap;
+  }
+  td:first-child { text-align: center; }
+  td:last-child { border-right: none; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #f9f9f9; }
+  .red-val { color: #c0392b; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="section-title">해외주식</div>
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>주별(시작일)</th>
+      <th>나무 WAU</th>
+      <th>현재가 화면 WAU</th>
+      <th>주문화면 WAU</th>
+      <th>MTS 진입→현재가화면 진입율(%)</th>
+      <th class="highlight-col">MTS 진입→주문화면 진입율(%)</th>
+      <th>체결 WAU</th>
+      <th>체결율</th>
+      <th>체결금액 WAU</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>20251230</td><td>1,170,412</td><td>209,148</td><td>108,728</td><td>18.5</td><td>9.43</td><td>51,118</td><td>4.37</td><td>657,815,333,934</td></tr>
+    <tr><td>20260106</td><td>1,507,400</td><td>380,690</td><td>218,819</td><td>25.32</td><td>14.54</td><td>130,022</td><td>8.63</td><td>3,066,641,539,796</td></tr>
+    <tr><td>20260113</td><td>1,505,259</td><td>384,949</td><td>219,123</td><td>25.61</td><td>14.57</td><td>127,920</td><td>8.50</td><td>3,596,266,667,124</td></tr>
+    <tr><td>20260120</td><td>1,657,197</td><td>405,078</td><td>232,174</td><td>24.44</td><td>14.01</td><td>135,924</td><td>8.20</td><td>3,510,625,545,889</td></tr>
+    <tr><td>20260127</td><td>1,695,066</td><td>441,539</td><td>255,990</td><td>26.09</td><td>15.1</td><td>157,077</td><td>9.27</td><td>4,425,546,157,284</td></tr>
+    <tr><td>20260203</td><td>1,638,662</td><td>441,584</td><td>249,743</td><td>26.93</td><td>15.25</td><td>158,998</td><td>9.70</td><td>4,859,665,616,330</td></tr>
+    <tr><td>20260210</td><td>1,583,651</td><td>389,515</td><td>209,104</td><td>24.47</td><td>13.18</td><td>123,936</td><td>7.83</td><td>3,076,255,287,039</td></tr>
+    <tr><td>20260217</td><td>1,636,743</td><td>341,188</td><td>170,943</td><td>20.82</td><td>10.42</td><td>90,683</td><td>5.54</td><td>1,939,492,879,411</td></tr>
+    <tr><td>20260224</td><td>1,859,236</td><td>439,663</td><td>229,269</td><td>23.72</td><td>12.35</td><td>130,266</td><td>7.01</td><td>3,050,892,164,999</td></tr>
+    <tr><td>20260303</td><td>1,835,159</td><td>435,203</td><td>222,694</td><td>23.62</td><td>12.11</td><td>124,435</td><td>6.78</td><td>4,033,826,714,691</td></tr>
+    <tr><td>20260310</td><td>1,703,667</td><td>377,143</td><td>408,695</td><td>22.09</td><td class="red-val">24.46</td><td>104,626</td><td>6.14</td><td>3,226,083,029,403</td></tr>
+    <tr><td>20260317</td><td>1,736,010</td><td>360,622</td><td>468,865</td><td>20.82</td><td class="red-val">26.85</td><td>105,031</td><td>6.05</td><td>3,193,733,359,407</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="section-title">국내주식</div>
+<div class="table-wrap">
+<table>
+  <thead>
+    <tr>
+      <th>주별(시작일)</th>
+      <th>나무 WAU</th>
+      <th>현재가 화면 WAU</th>
+      <th>주문화면 WAU</th>
+      <th>MTS 진입→현재가화면 진입율(%)</th>
+      <th class="highlight-col">MTS 진입→주문화면 진입율(%)</th>
+      <th>체결 WAU</th>
+      <th>체결율</th>
+      <th>체결금액 WAU</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>20251229</td><td>1,170,412</td><td>616,936</td><td>403,756</td><td>52.71</td><td>34.5</td><td>230,742</td><td>19.71</td><td>3,453,164,245,985</td></tr>
+    <tr><td>20260105</td><td>1,507,400</td><td>981,480</td><td>772,402</td><td>65.11</td><td>51.24</td><td>530,667</td><td>35.20</td><td>22,656,732,044,501</td></tr>
+    <tr><td>20260112</td><td>1,505,259</td><td>992,049</td><td>772,605</td><td>65.91</td><td>51.33</td><td>524,404</td><td>34.84</td><td>23,751,834,285,727</td></tr>
+    <tr><td>20260119</td><td>1,657,197</td><td>1,078,931</td><td>868,792</td><td>65.11</td><td>52.43</td><td>620,285</td><td>37.43</td><td>33,982,181,865,647</td></tr>
+    <tr><td>20260126</td><td>1,695,066</td><td>1,184,801</td><td>1,032,089</td><td>69.9</td><td>60.89</td><td>789,361</td><td>46.57</td><td>39,658,098,271,774</td></tr>
+    <tr><td>20260202</td><td>1,638,662</td><td>1,112,198</td><td>923,575</td><td>67.87</td><td>56.36</td><td>673,288</td><td>41.09</td><td>32,455,325,439,517</td></tr>
+    <tr><td>20260209</td><td>1,583,651</td><td>1,054,092</td><td>842,599</td><td>66.56</td><td>53.21</td><td>581,360</td><td>36.71</td><td>26,661,429,529,651</td></tr>
+    <tr><td>20260216</td><td>1,636,743</td><td>983,624</td><td>743,404</td><td>60.1</td><td>45.42</td><td>454,728</td><td>27.78</td><td>12,975,403,798,110</td></tr>
+    <tr><td>20260223</td><td>1,859,236</td><td>1,225,034</td><td>1,033,852</td><td>65.89</td><td>55.61</td><td>737,302</td><td>39.66</td><td>39,245,897,586,748</td></tr>
+    <tr><td>20260302</td><td>1,835,159</td><td>1,314,964</td><td>1,162,531</td><td>71.65</td><td>63.35</td><td>890,132</td><td>48.50</td><td>43,041,760,536,675</td></tr>
+    <tr><td>20260309</td><td>1,703,667</td><td>1,144,017</td><td>948,813</td><td>67.15</td><td>55.69</td><td>633,439</td><td>37.18</td><td>28,496,394,732,022</td></tr>
+    <tr><td>20260316</td><td>1,736,010</td><td>1,118,657</td><td>923,616</td><td>64.44</td><td>53.2</td><td>587,666</td><td>33.85</td><td>24,907,703,055,940</td></tr>
+  </tbody>
+</table>
+</div>
+
+</body>
+</html>
