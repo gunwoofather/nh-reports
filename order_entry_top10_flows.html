@@ -1,0 +1,415 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.w { padding: 1rem 0; font-family: var(--font-sans); }
+.tabs { display: flex; gap: 6px; margin-bottom: 1rem; flex-wrap: wrap; }
+.tab { font-size: 12px; padding: 5px 14px; border: 0.5px solid var(--color-border-secondary); border-radius: 20px; cursor: pointer; background: transparent; color: var(--color-text-secondary); }
+.tab.active { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+.sec { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
+.note { font-size: 11px; color: var(--color-text-tertiary); background: var(--color-background-secondary); border-radius: 6px; padding: 6px 10px; margin-bottom: 12px; line-height: 1.6; }
+
+/* 플로우 카드 */
+.flow-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 12px; padding: 13px 14px; margin-bottom: 8px; }
+.flow-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.flow-rank { width: 26px; height: 26px; border-radius: 50%; background: var(--color-background-secondary); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: var(--color-text-secondary); flex-shrink: 0; }
+.flow-title { font-size: 13px; font-weight: 500; flex: 1; }
+.flow-meta { font-size: 11px; color: var(--color-text-secondary); display: flex; gap: 10px; margin-top: 2px; flex-wrap: wrap; }
+.flow-steps { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.fs { padding: 5px 10px; border-radius: 6px; font-size: 12px; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); white-space: nowrap; }
+.fs.end { background: #E8593C; color: #fff; border-color: #E8593C; font-weight: 500; }
+.fs.key { border: 1.5px solid #378ADD; color: var(--color-text-primary); }
+.arrow { color: var(--color-text-tertiary); font-size: 13px; flex-shrink: 0; }
+.flow-insight { font-size: 12px; color: var(--color-text-secondary); line-height: 1.6; border-left: 3px solid var(--color-border-secondary); padding-left: 8px; }
+.badge { display: inline-block; font-size: 10px; padding: 2px 7px; border-radius: 8px; margin-left: 6px; }
+.b1 { background:#E6F1FB; color:#185FA5; }
+.b2 { background:#FAECE7; color:#993C1D; }
+.b3 { background:#EAF3DE; color:#3B6D11; }
+.b4 { background:#FAEEDA; color:#854F0B; }
+.b5 { background:#EEEDFE; color:#3C3489; }
+@media (prefers-color-scheme: dark) {
+  .b1{background:#0C447C;color:#B5D4F4} .b2{background:#712B13;color:#F5C4B3}
+  .b3{background:#27500A;color:#C0DD97} .b4{background:#633806;color:#FAC775}
+  .b5{background:#3C3489;color:#CECBF6}
+  .fs.end { background: #D85A30; border-color: #D85A30; }
+}
+
+/* 유형별 요약 */
+.type-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-bottom: 1rem; }
+.type-card { border-radius: 10px; padding: 12px; border: 0.5px solid var(--color-border-tertiary); }
+.type-title { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+.type-share { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+.type-desc { font-size: 11px; color: var(--color-text-secondary); line-height: 1.55; }
+.type-flows { font-size: 11px; color: var(--color-text-tertiary); margin-top: 5px; }
+
+/* step 빈도 바 */
+.bar-row { display: grid; grid-template-columns: 130px 1fr 40px; gap: 6px; align-items: center; margin-bottom: 5px; }
+.bar-label { font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--color-text-secondary); }
+.bar-track { background: var(--color-border-tertiary); border-radius: 3px; height: 7px; }
+.bar-fill { height: 100%; border-radius: 3px; }
+.bar-val { font-size: 11px; color: var(--color-text-secondary); text-align: right; }
+
+.tag { display: inline-block; font-size: 10px; padding: 2px 6px; border-radius: 8px; margin: 2px 2px 0 0; }
+.ta{background:#FAECE7;color:#993C1D} .tb{background:#E6F1FB;color:#185FA5}
+.tg{background:#EAF3DE;color:#3B6D11} .ty{background:#FAEEDA;color:#854F0B}
+.tp{background:#EEEDFE;color:#3C3489}
+@media (prefers-color-scheme: dark) {
+  .ta{background:#712B13;color:#F5C4B3} .tb{background:#0C447C;color:#B5D4F4}
+  .tg{background:#27500A;color:#C0DD97} .ty{background:#633806;color:#FAC775}
+  .tp{background:#3C3489;color:#CECBF6}
+}
+.ins-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; }
+.ins-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 10px; padding: 12px; }
+.ins-card h4 { font-size: 12px; font-weight: 500; margin-bottom: 4px; }
+.ins-card p { font-size: 11px; color: var(--color-text-secondary); line-height: 1.65; }
+.ins-stat { font-size: 17px; font-weight: 500; margin: 3px 0 5px; }
+</style>
+
+<div class="w">
+<div class="tabs">
+  <button class="tab active" onclick="show('flows')">Top 10 플로우</button>
+  <button class="tab" onclick="show('type')">유형별 분류</button>
+  <button class="tab" onclick="show('freq')">화면별 등장 빈도</button>
+  <button class="tab" onclick="show('insight')">인사이트</button>
+</div>
+
+<!-- Top 10 플로우 -->
+<div id="tab-flows">
+  <div class="note">해외주식 주문 화면([3660]) 도달 직전 3단계 경로. step1→step2→step3→해외주식 주문. 세션 레벨 raw 데이터 기반, 등장 빈도 순 정렬.</div>
+
+  <div id="flow-list"></div>
+</div>
+
+<!-- 유형별 분류 -->
+<div id="tab-type" style="display:none">
+  <div class="sec">주문 진입 유형 5가지 — 전체 경로의 성격 분류</div>
+  <div class="type-grid" id="type-grid"></div>
+</div>
+
+<!-- 화면별 등장 빈도 -->
+<div id="tab-freq" style="display:none">
+  <div class="sec">step3 (주문 직전 화면) 빈도</div>
+  <div style="margin-bottom:6px;font-size:11px;color:var(--color-text-tertiary)">해외주식 주문 바로 직전에 어느 화면에 있었는가</div>
+  <div id="step3-bars"></div>
+  <div class="sec" style="margin-top:12px">step1 (3단계 전 화면) 빈도</div>
+  <div style="margin-bottom:6px;font-size:11px;color:var(--color-text-tertiary)">세션이 어떤 화면에서 시작됐는가</div>
+  <div id="step1-bars"></div>
+</div>
+
+<!-- 인사이트 -->
+<div id="tab-insight" style="display:none">
+  <div class="ins-grid" id="ins-cards"></div>
+</div>
+</div>
+
+<script>
+const flows = [
+  {
+    rank: 1,
+    title: '국내주식 거래 중 해외로 전환',
+    badge: 'b2', badgeText: '국내→해외 전환',
+    steps: ['국내주식 주문', '잔고·손익', '국내주식 주문'],
+    sessions: '다수 세션 반복',
+    cnt: '최다 등장',
+    insight: '국내주식 주문(2110) ↔ 잔고·손익(4210)을 교차하며 거래하다 해외주문으로 전환. 국내·해외를 동시에 거래하는 멀티 트레이더의 전형적인 패턴. 잔고 화면에서 해외주식 CTA 노출 시 자연스럽게 유입 가능.',
+    keyStep: 1,
+  },
+  {
+    rank: 2,
+    title: '관심그룹·잔고 루프 후 주문',
+    badge: 'b1', badgeText: '포지션 확인형',
+    steps: ['관심그룹', '잔고·손익', '관심그룹'],
+    sessions: '다수 세션',
+    cnt: '2위 등장',
+    insight: '관심그룹(1110) ↔ 잔고·손익(4210) 사이를 순환하다 주문 진입. 보유 종목을 확인하고 관심 종목과 비교한 뒤 매매 결정. 관심그룹에서 해외주식 주문으로 가는 직접 CTA가 이 경로를 단축.',
+    keyStep: 0,
+  },
+  {
+    rank: 3,
+    title: '메뉴 탐색 후 직접 진입',
+    badge: 'b4', badgeText: '메뉴 탐색형',
+    steps: ['어디서든', 'MainMenu', '메뉴(001m)'],
+    sessions: '20%+ 경로',
+    cnt: '3위 패턴',
+    insight: 'MainMenu(메인메뉴 팝업) → 메뉴(001m) 2단계를 거쳐 해외주문 진입. step1은 홈·잔고·국내주문·이체 등 다양함. 어디에서든 MainMenu를 열어 해외주식을 찾아가는 탐색형. 퀵바에 해외주식 주문 기본 노출 시 2단계 friction 제거.',
+    keyStep: 2,
+  },
+  {
+    rank: 4,
+    title: '환전 완료 후 즉시 주문',
+    badge: 'b3', badgeText: '환전→주문 연결',
+    steps: ['환전내역', '환전하기', '환전하기'],
+    sessions: '복수 세션',
+    cnt: '4위 패턴',
+    insight: '환전내역(3473) 확인 → 환전하기(3570) 2회 방문 후 주문. 환전을 완료한 직후가 주문 의향 최고점. 환전하기 완료 화면에 "지금 해외주식 주문하기" CTA 하나로 이 경로를 지름길로 만들 수 있음.',
+    keyStep: 2,
+  },
+  {
+    rank: 5,
+    title: '해외주식 체결내역·잔고 순환 후 재주문',
+    badge: 'b2', badgeText: '포지션 관리형',
+    steps: ['해외체결내역', '잔고·손익', '관심그룹'],
+    sessions: '세션 1772785719 집중',
+    cnt: '5위 패턴',
+    insight: '해외주식 체결내역(3560) ↔ 잔고·손익(4210) ↔ 관심그룹(1110) 세 화면을 순환하며 재주문. 이미 해외주식을 보유한 고객이 체결 확인·잔고 점검 후 추가 주문을 내는 패턴. 데이트레이딩 성향의 초고빈도 사용자.',
+    keyStep: 0,
+  },
+  {
+    rank: 6,
+    title: '홈·관심그룹 탐색 후 주문',
+    badge: 'b1', badgeText: '홈 출발형',
+    steps: ['관심그룹', '홈', '관심그룹'],
+    sessions: '복수 세션',
+    cnt: '6위 패턴',
+    insight: '관심그룹 → 홈 복귀 → 관심그룹 재방문 후 주문. 한 번에 결정하지 않고 홈을 거쳐 재확인 후 매매 결정. 관심그룹에서 바로 주문으로 이어지는 경로가 없어 홈을 경유하는 우회 발생.',
+    keyStep: 2,
+  },
+  {
+    rank: 7,
+    title: '주식현재가·국내주문 교차 후 해외 전환',
+    badge: 'b2', badgeText: '국내→해외 전환',
+    steps: ['주식 현재가', '국내주식 주문', '잔고·손익'],
+    sessions: '복수 세션',
+    cnt: '7위 패턴',
+    insight: '주식현재가(1210) → 국내주문(2110) → 잔고(4210) → 해외주문. 국내 종목 시세 확인 → 주문 → 잔고 확인 후 해외로 전환. 국내 거래를 완료한 직후 해외주식으로 넘어오는 순차 거래 패턴.',
+    keyStep: 1,
+  },
+  {
+    rank: 8,
+    title: '해외주식 거래신청 완료 후 첫 주문',
+    badge: 'b5', badgeText: '신규 진입형',
+    steps: ['거래신청(5360)', 'MainMenu', '메뉴(001m)'],
+    sessions: '복수 세션 (3개+)',
+    cnt: '8위 패턴',
+    insight: '해외주식 거래신청(5360/3610) 완료 후 MainMenu → 메뉴를 거쳐 첫 주문. 신규 해외주식 진입자의 온보딩 완결 플로우. 거래신청 완료 화면에서 주문으로 바로 연결되지 않아 메뉴 탐색을 다시 해야 하는 friction 존재.',
+    keyStep: 0,
+  },
+  {
+    rank: 9,
+    title: '레버리지 ETP 교육 이수 후 주문',
+    badge: 'b5', badgeText: '교육 이수형',
+    steps: ['ETP 사전교육(594c)', '거래신청(5360)', '메뉴(001m)'],
+    sessions: '복수 세션',
+    cnt: '9위 패턴',
+    insight: '레버리지 ETP 사전교육(594c) 이수 → 해외거래신청(5360) → 메뉴 → 주문. 교육부터 거래신청까지 완료한 직후의 첫 주문. 이 경로에서 이탈하면 재유입이 어렵다. 교육 완료 화면에 "첫 주문 시작" 버튼 필요.',
+    keyStep: 0,
+  },
+  {
+    rank: 10,
+    title: '금현물·국내 거래 중 해외 전환',
+    badge: 'b4', badgeText: '멀티 자산형',
+    steps: ['금현물(2120)', '홈 또는 메뉴', '금현물 또는 주문'],
+    sessions: '복수 세션 (세션 1774224849 등)',
+    cnt: '10위 패턴',
+    insight: '금현물(2120) ↔ 홈/메뉴를 오가다 해외주식 주문 진입. 금현물·국내주식·해외주식을 동시에 운용하는 다자산 투자자. 금현물 화면에서도 해외주식 크로스셀 CTA가 유효할 수 있음.',
+    keyStep: 0,
+  },
+];
+
+const types = [
+  {
+    title: '국내→해외 동시 거래형',
+    share: '~35%',
+    color: '#FAECE7',
+    textColor: '#993C1D',
+    desc: '국내주식 주문·잔고·주식현재가를 오가다 해외주문으로 전환. 국내와 해외를 같은 세션에서 동시에 거래하는 멀티 트레이더.',
+    flows: '플로우 1, 7, 10',
+    tags: ['ta'],
+  },
+  {
+    title: '포지션 확인 후 추가 주문형',
+    share: '~25%',
+    color: '#E6F1FB',
+    textColor: '#185FA5',
+    desc: '관심그룹·잔고·해외체결내역을 순환하며 현재 포지션을 확인한 뒤 추가 매매 결정. 기존 보유자의 재주문 패턴.',
+    flows: '플로우 2, 5, 6',
+    tags: ['tb'],
+  },
+  {
+    title: '메뉴 탐색 진입형',
+    share: '~20%',
+    color: '#FAEEDA',
+    textColor: '#854F0B',
+    desc: 'MainMenu → 메뉴(001m)를 열어 해외주식을 찾아 진입. 퀵바·홈 직접 CTA를 쓰지 않는 탐색형. 어떤 화면에서든 메뉴를 열어 이동.',
+    flows: '플로우 3, 8(일부)',
+    tags: ['ty'],
+  },
+  {
+    title: '환전 완료 즉시 주문형',
+    share: '~8%',
+    color: '#EAF3DE',
+    textColor: '#3B6D11',
+    desc: '환전내역·환전하기를 완료한 직후 주문 진입. 환전이 완료되는 순간이 주문 의향 최고점. 환전→주문 직결 경로.',
+    flows: '플로우 4',
+    tags: ['tg'],
+  },
+  {
+    title: '신규 진입·교육 이수형',
+    share: '~7%',
+    color: '#EEEDFE',
+    textColor: '#3C3489',
+    desc: '거래신청·교육 이수를 완료한 직후 첫 주문. 신규 해외주식 진입자의 온보딩 완결 플로우. 이탈 시 재유입 어려움.',
+    flows: '플로우 8, 9',
+    tags: ['tp'],
+  },
+  {
+    title: '기타 다양한 경로',
+    share: '~5%',
+    color: 'var(--color-background-secondary)',
+    textColor: 'var(--color-text-secondary)',
+    desc: '뉴스인사이트, 지수환율, 이벤트 페이지, 챗봇, 고객센터 경유 후 주문. 롱테일 다양 경로.',
+    flows: '다수 단발성 경로',
+    tags: [],
+  },
+];
+
+const step3Freq = [
+  {name:'관심그룹', cnt:158, color:'#E8593C'},
+  {name:'잔고·손익', cnt:145, color:'#E8593C'},
+  {name:'국내주식 주문', cnt:112, color:'#E8593C'},
+  {name:'메뉴(001m)', cnt:108, color:'#378ADD'},
+  {name:'홈', cnt:72, color:'#378ADD'},
+  {name:'주식 현재가', cnt:65, color:'#378ADD'},
+  {name:'환전하기', cnt:38, color:'#1D9E75'},
+  {name:'해외주식 체결내역', cnt:35, color:'#1D9E75'},
+  {name:'내 자산', cnt:22, color:'#888780'},
+  {name:'해외주식 현재가', cnt:18, color:'#1D9E75'},
+];
+
+const step1Freq = [
+  {name:'관심그룹', cnt:89, color:'#E8593C'},
+  {name:'홈', cnt:79, color:'#378ADD'},
+  {name:'국내주식 주문', cnt:78, color:'#E8593C'},
+  {name:'잔고·손익', cnt:67, color:'#E8593C'},
+  {name:'주식 현재가', cnt:55, color:'#378ADD'},
+  {name:'메뉴(001m)', cnt:42, color:'#378ADD'},
+  {name:'MainMenu', cnt:35, color:'#378ADD'},
+  {name:'해외주식 현재가', cnt:22, color:'#1D9E75'},
+  {name:'환전 관련', cnt:21, color:'#1D9E75'},
+  {name:'이체', cnt:18, color:'#888780'},
+];
+
+function buildFlows() {
+  const el = document.getElementById('flow-list');
+  flows.forEach(f => {
+    const card = document.createElement('div');
+    card.className = 'flow-card';
+    const steps = f.steps.map((s, i) => {
+      const isEnd = false;
+      const isKey = i === f.keyStep;
+      return `<span class="fs${isKey ? ' key' : ''}">${s}</span>${i < f.steps.length - 1 ? '<span class="arrow">→</span>' : ''}`;
+    }).join('');
+    card.innerHTML = `
+      <div class="flow-header">
+        <div class="flow-rank">${f.rank}</div>
+        <div style="flex:1">
+          <div class="flow-title">${f.title}<span class="badge ${f.badge}">${f.badgeText}</span></div>
+          <div class="flow-meta"><span>${f.sessions}</span></div>
+        </div>
+      </div>
+      <div class="flow-steps">
+        ${steps}
+        <span class="arrow">→</span>
+        <span class="fs end">해외주식 주문</span>
+      </div>
+      <div class="flow-insight">${f.insight}</div>`;
+    el.appendChild(card);
+  });
+}
+
+function buildTypes() {
+  const el = document.getElementById('type-grid');
+  types.forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'type-card';
+    div.style.background = t.color;
+    div.innerHTML = `
+      <div class="type-title" style="color:${t.textColor}">${t.title}</div>
+      <div class="type-share" style="color:${t.textColor}">${t.share}</div>
+      <div class="type-desc">${t.desc}</div>
+      <div class="type-flows" style="margin-top:6px">해당: ${t.flows}</div>`;
+    el.appendChild(div);
+  });
+}
+
+function buildBars(data, id) {
+  const el = document.getElementById(id);
+  const max = Math.max(...data.map(d => d.cnt));
+  data.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <span class="bar-label">${d.name}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${(d.cnt/max*100).toFixed(0)}%;background:${d.color}"></div></div>
+      <span class="bar-val">${d.cnt}</span>`;
+    el.appendChild(row);
+  });
+}
+
+function buildInsights() {
+  const el = document.getElementById('ins-cards');
+  const cards = [
+    {
+      title: '직전 화면 1·2위가 관심그룹·잔고 — 종목 탐색이 주문 트리거',
+      stat: '관심그룹 158건 · 잔고·손익 145건',
+      body: '주문 직전(step3) 가장 많이 거친 화면이 관심그룹(158)과 잔고·손익(145). 관심 종목을 보다가, 또는 현재 포지션을 확인하다 주문을 결심하는 패턴이 가장 일반적. 이 두 화면에 해외주식 주문 CTA가 없다는 것이 기회.',
+      tags:[{t:'관심그룹 1위',c:'ta'},{t:'잔고 2위',c:'ta'},{t:'CTA 기회',c:'tg'}],
+    },
+    {
+      title: '메뉴 탐색이 20% — 퀵바에 노출되지 않아 우회 중',
+      stat: 'MainMenu→메뉴 경로 ~20%',
+      body: 'step2·step3에서 메뉴(001m)가 상위권. 퀵바나 홈 CTA를 쓰지 않고 메뉴를 2단계 거쳐 진입하는 고객이 전체의 20%. 해외주식 주문을 퀵바 기본 항목에 추가하면 이 우회 경로를 없앨 수 있음.',
+      tags:[{t:'메뉴 2단계 우회',c:'ty'},{t:'퀵바 개선 기회',c:'tg'}],
+    },
+    {
+      title: '환전 직후가 주문 의향 최고점 — 연결 CTA 부재',
+      stat: '환전하기 step3 7위 (38건)',
+      body: '환전하기(3570)가 주문 직전 화면 7위. 환전을 마친 순간이 "이제 뭔가 살 수 있다"는 의향이 가장 높은 시점인데, 환전 완료 화면에서 주문으로 직결하는 버튼이 없어 별도로 메뉴를 탐색해야 함.',
+      tags:[{t:'환전→주문 단절',c:'ta'},{t:'완료 화면 CTA 필요',c:'tg'}],
+    },
+    {
+      title: '거래신청·교육 완료 후 메뉴 재탐색 — 온보딩 단절',
+      stat: '거래신청(5360) → MainMenu → 메뉴 → 주문',
+      body: '거래신청 또는 교육을 완료했는데 바로 주문으로 이어지지 않고 MainMenu → 메뉴를 다시 탐색. 신규 진입자가 "이제 뭘 하면 되지?"를 모르는 상태. 완료 화면에 "첫 주문 시작하기" 버튼 하나로 해결 가능.',
+      tags:[{t:'온보딩 단절',c:'tp'},{t:'신규 진입자',c:'tp'}],
+    },
+    {
+      title: '세션 1772785719 — 한 사람이 82개 경로 생성',
+      stat: '해외체결↔잔고↔관심 무한 순환',
+      body: '단일 세션에서 해외체결내역(3560) ↔ 잔고(4210) ↔ 관심그룹(1110) 3개 화면 조합을 수십 회 반복하며 다수 주문을 집행한 초고빈도 트레이더. 이 세션을 제외해도 해당 패턴의 구조적 의미는 동일.',
+      tags:[{t:'초고빈도 트레이더',c:'ta'},{t:'체결→잔고→관심 루프',c:'ta'}],
+    },
+    {
+      title: '금현물·다자산 투자자도 해외주식 주문 진입',
+      stat: '금현물(2120) 경유 복수 세션 확인',
+      body: '금현물(2120) ↔ 홈/메뉴를 오가다 해외주식 주문으로 이동하는 세션이 복수 확인. 주식뿐 아니라 금현물·해외주식·국내주식을 동시에 운용하는 다자산 투자자. 자산 화면 간 크로스셀 CTA 가능성.',
+      tags:[{t:'다자산 투자자',c:'tb'},{t:'크로스셀 기회',c:'tg'}],
+    },
+  ];
+  cards.forEach(d => {
+    const tags = d.tags.map(t=>`<span class="tag ${t.c}">${t.t}</span>`).join('');
+    const div = document.createElement('div');
+    div.className = 'ins-card';
+    div.innerHTML = `
+      <h4>${d.title}</h4>
+      <div class="ins-stat">${d.stat}</div>
+      <p>${d.body}</p>
+      <div style="margin-top:6px">${tags}</div>`;
+    el.appendChild(div);
+  });
+}
+
+function show(id) {
+  ['flows','type','freq','insight'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t===id?'':'none';
+  });
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${id}'`));
+  });
+}
+
+buildFlows();
+buildTypes();
+buildBars(step3Freq, 'step3-bars');
+buildBars(step1Freq, 'step1-bars');
+buildInsights();
+</script>
